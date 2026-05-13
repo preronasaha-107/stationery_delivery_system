@@ -35,10 +35,21 @@ body{
 <%@include file="navbar.jsp"%>
 
 <%
-    int id = Integer.parseInt(request.getParameter("id"));
+    int id = 0;
+    try{
+        id = Integer.parseInt(request.getParameter("id"));
+    } catch(Exception e){
+        response.sendRedirect("all_items.jsp");
+        return;
+    }
 
     ItemDAOImpl dao = new ItemDAOImpl(DBConnect.getConn());
     itemdtls b = dao.getItemById(id);
+
+    if(b == null){
+        response.sendRedirect("all_items.jsp");
+        return;
+    }
 %>
 
 <div class="container">
@@ -79,15 +90,18 @@ body{
         <input type="number"
                name="quantity"
                class="form-control"
+               min="0"
                value="<%=b.getItem_quantity()%>">
     </div>
 
     <!-- Price -->
     <div class="form-group">
         <label>Price</label>
-        <input type="text"
+        <input type="number"
                name="price"
                class="form-control"
+               min="0"
+               step="0.01"
                value="<%=b.getPrice()%>">
     </div>
 

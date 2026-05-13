@@ -13,6 +13,7 @@ import com.DAO.CartDAOImpl;
 import com.DAO.ItemDAOImpl;
 import com.DB.DBConnect;
 import com.entity.Cart;
+import com.entity.User;
 import com.entity.itemdtls;
 
 @WebServlet("/cart")
@@ -31,8 +32,16 @@ public class CartServlet extends HttpServlet {
 			iid =
 			Integer.parseInt(req.getParameter("iid"));
 
-			uid =
-			Integer.parseInt(req.getParameter("uid"));
+			String uidParam = req.getParameter("uid");
+			if(uidParam != null && !uidParam.trim().isEmpty()) {
+				uid = Integer.parseInt(uidParam);
+			}
+
+			HttpSession session = req.getSession();
+			User loginUser = (User)session.getAttribute("userobj");
+			if(loginUser != null) {
+				uid = loginUser.getId();
+			}
 
 			int quantity = 1;
 			String qtyParam = req.getParameter("quantity");
@@ -52,8 +61,6 @@ public class CartServlet extends HttpServlet {
 
 				return;
 			}
-
-			HttpSession session = req.getSession();
 
 			if(quantity < 1) {
 				session.setAttribute("failedMsg", "Please select at least 1 item.");

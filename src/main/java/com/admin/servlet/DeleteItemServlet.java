@@ -39,6 +39,8 @@ public class DeleteItemServlet extends HttpServlet {
 
         } catch(Exception e) {
             e.printStackTrace();
+            req.getSession().setAttribute("failedMsg", "Something went wrong");
+            resp.sendRedirect("admin/all_items.jsp");
         }
     }
 }

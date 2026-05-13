@@ -11,6 +11,7 @@ import javax.servlet.http.HttpSession;
 
 import com.DAO.CartDAOImpl;
 import com.DB.DBConnect;
+import com.entity.User;
 
 @WebServlet("/remove_cart")
 public class RemoveCartServlet extends HttpServlet {
@@ -27,6 +28,11 @@ public class RemoveCartServlet extends HttpServlet {
 			String uidParam = req.getParameter("uid");
 			if(uidParam != null && !uidParam.trim().isEmpty()) {
 				uid = Integer.parseInt(uidParam);
+			}
+
+			User loginUser = (User)req.getSession().getAttribute("userobj");
+			if(loginUser != null) {
+				uid = loginUser.getId();
 			}
 
 			CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());

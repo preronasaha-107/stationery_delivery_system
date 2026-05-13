@@ -123,6 +123,7 @@ session.removeAttribute("failedMsg");
                             <input type="number"
                                    name="quantity"
                                    class="form-control"
+                                   min="0"
                                    required="required">
 
                         </div>
@@ -136,6 +137,8 @@ session.removeAttribute("failedMsg");
                             <input type="number"
                                    name="price"
                                    class="form-control"
+                                   min="0"
+                                   step="0.01"
                                    required="required">
 
                         </div>
@@ -202,7 +205,8 @@ session.removeAttribute("failedMsg");
 
                             <input type="file"
                                    name="photo"
-                                   class="form-control-file">
+                                   class="form-control-file"
+                                   required="required">
 
                         </div>
 

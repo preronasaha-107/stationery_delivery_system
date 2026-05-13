@@ -74,6 +74,10 @@ public class RegisterServlet extends HttpServlet {
         } catch (Exception e) {
 
             e.printStackTrace();
+            req.getSession().setAttribute(
+                    "failedMsg",
+                    "Something went wrong");
+            resp.sendRedirect("register.jsp");
         }
     }
 }

@@ -23,6 +23,29 @@
 
 <h2 class="text-center mb-4">Admin : All Items</h2>
 
+<%
+String succMsg = (String)session.getAttribute("succMsg");
+String failedMsg = (String)session.getAttribute("failedMsg");
+
+if(succMsg != null){
+%>
+<div class="alert alert-success text-center" role="alert">
+<%=succMsg%>
+</div>
+<%
+session.removeAttribute("succMsg");
+}
+
+if(failedMsg != null){
+%>
+<div class="alert alert-danger text-center" role="alert">
+<%=failedMsg%>
+</div>
+<%
+session.removeAttribute("failedMsg");
+}
+%>
+
 <table class="table table-striped table-bordered">
 
   <thead class="bg-primary text-white">

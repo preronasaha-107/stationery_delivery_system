@@ -12,9 +12,9 @@
 
 		</div>
 		<div class="col-md-4">
-			<form class="form-inline my-2 my-lg-0">
+			<form class="form-inline my-2 my-lg-0" action="../search_items.jsp" method="get">
 				<input class="form-control mr-sm-2" type="search"
-					placeholder="Search" aria-label="Search">
+					placeholder="Search" aria-label="Search" name="query" required>
 				<button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
 			</form>
 
@@ -30,7 +30,7 @@
 
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-	<a class="navbar-brand" href="#"><i class="fa-solid fa-house"></i></a>
+	<a class="navbar-brand" href="home.jsp"><i class="fa-solid fa-house"></i></a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse"
 		data-target="#navbarSupportedContent"
 		aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -43,7 +43,5 @@
 			<li class="nav-item active"><a class="nav-link" href="home.jsp">Home
 					<span class="sr-only">(current)</span>
 			</a></li>
-			
-		</form>
 	</div>
 </nav>

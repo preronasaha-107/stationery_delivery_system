@@ -30,7 +30,7 @@
 
 
 <nav class="navbar navbar-expand-lg navbar-dark bg-custom">
-	<a class="navbar-brand" href="#"><i class="fa-solid fa-house"></i></a>
+	<a class="navbar-brand" href="index.jsp"><i class="fa-solid fa-house"></i></a>
 	<button class="navbar-toggler" type="button" data-toggle="collapse"
 		data-target="#navbarSupportedContent"
 		aria-controls="navbarSupportedContent" aria-expanded="false"
@@ -52,9 +52,9 @@
 		</ul>
 		<form class="form-inline my-2 my-lg-0">
 		
-			<button class="btn btn-light my-2 my-sm-0 ml-1" type="submit"><i class="fa-solid fa-gear"></i>Setting</button>
+			<button class="btn btn-light my-2 my-sm-0 ml-1" type="button"><i class="fa-solid fa-gear"></i>Setting</button>
 			
-			<button class="btn btn-light my-2 my-sm-0 ml-1" type="submit"><i class="fa-solid fa-person-circle-plus"></i>Contact us</button>
+			<button class="btn btn-light my-2 my-sm-0 ml-1" type="button"><i class="fa-solid fa-person-circle-plus"></i>Contact us</button>
 		</form>
 	</div>
 </nav>
