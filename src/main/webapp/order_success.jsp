@@ -26,8 +26,8 @@ if(orderTotal == null){
 <title>Order Placed</title>
 <%@include file="all_component/allCSS.jsp"%>
 <style>
-body{background:#f5f7fb;}
-.success-card{border:none;border-radius:18px;box-shadow:0 16px 34px rgba(15,23,42,0.09);}
+body{background-color:#f0f1f2;}
+.success-card{border:1px solid #dee2e6;}
 </style>
 </head>
 <body>
