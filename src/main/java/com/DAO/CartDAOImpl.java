@@ -4,7 +4,9 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.entity.Cart;
 
@@ -23,6 +25,27 @@ public class CartDAOImpl implements CartDAO {
 		boolean f = false;
 
 		try {
+			Cart existingCart = getMergedCartEntry(c.getUid(), c.getBid());
+
+			if(existingCart != null) {
+
+				String sql = "update cart set itemname=?, price=?, total_price=? where cid=?";
+
+				PreparedStatement ps = conn.prepareStatement(sql);
+				ps.setString(1, c.getItemname());
+				ps.setDouble(2, c.getPrice());
+				ps.setDouble(3, existingCart.getTotal_price() + c.getTotal_price());
+				ps.setInt(4, existingCart.getCid());
+
+				int i = ps.executeUpdate();
+
+				if(i == 1) {
+					deleteDuplicateCartRows(c.getUid(), c.getBid(), existingCart.getCid());
+					f = true;
+				}
+
+				return f;
+			}
 
 			String sql =
 			"insert into cart(bid,uid,itemname,price,total_price) values(?,?,?,?,?)";
@@ -59,6 +82,7 @@ public class CartDAOImpl implements CartDAO {
 	public List<Cart> getCartByUser(int uid) {
 
 		List<Cart> list = new ArrayList<Cart>();
+		Map<Integer, Cart> cartByItem = new LinkedHashMap<Integer, Cart>();
 
 		try {
 
@@ -85,7 +109,14 @@ public class CartDAOImpl implements CartDAO {
 				}
 				c.setQuantity(quantity);
 
-				list.add(c);
+				Cart existingCart = cartByItem.get(c.getBid());
+
+				if(existingCart == null) {
+					cartByItem.put(c.getBid(), c);
+				} else {
+					existingCart.setTotal_price(existingCart.getTotal_price() + c.getTotal_price());
+					existingCart.setQuantity(existingCart.getQuantity() + c.getQuantity());
+				}
 			}
 
 		} catch (Exception e) {
@@ -93,6 +124,7 @@ public class CartDAOImpl implements CartDAO {
 			e.printStackTrace();
 		}
 
+		list.addAll(cartByItem.values());
 		return list;
 	}
 
@@ -102,16 +134,33 @@ public class CartDAOImpl implements CartDAO {
 		boolean f = false;
 
 		try {
+			int bid = 0;
 
-			String sql = "delete from cart where cid=? and uid=?";
+			String selectSql = "select bid from cart where cid=? and uid=?";
+
+			PreparedStatement selectPs = conn.prepareStatement(selectSql);
+			selectPs.setInt(1, cid);
+			selectPs.setInt(2, uid);
+
+			ResultSet rs = selectPs.executeQuery();
+
+			if(rs.next()) {
+				bid = rs.getInt(1);
+			}
+
+			if(bid == 0) {
+				return false;
+			}
+
+			String sql = "delete from cart where uid=? and bid=?";
 
 			PreparedStatement ps = conn.prepareStatement(sql);
-			ps.setInt(1, cid);
-			ps.setInt(2, uid);
+			ps.setInt(1, uid);
+			ps.setInt(2, bid);
 
 			int i = ps.executeUpdate();
 
-			if(i == 1) {
+			if(i > 0) {
 				f = true;
 			}
 
@@ -176,5 +225,63 @@ public class CartDAOImpl implements CartDAO {
 		}
 
 		return quantity;
+	}
+
+	private Cart getMergedCartEntry(int uid, int bid) {
+
+		Cart cart = null;
+
+		try {
+
+			String sql = "select cid,bid,uid,itemname,price,total_price from cart where uid=? and bid=? order by cid asc";
+
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, uid);
+			ps.setInt(2, bid);
+
+			ResultSet rs = ps.executeQuery();
+
+			while(rs.next()) {
+				if(cart == null) {
+					cart = new Cart();
+					cart.setCid(rs.getInt("cid"));
+					cart.setBid(rs.getInt("bid"));
+					cart.setUid(rs.getInt("uid"));
+					cart.setItemname(rs.getString("itemname"));
+					cart.setPrice(rs.getDouble("price"));
+					cart.setTotal_price(0.0);
+				}
+
+				cart.setTotal_price(cart.getTotal_price() + rs.getDouble("total_price"));
+			}
+
+			if(cart != null && cart.getPrice() > 0) {
+				cart.setQuantity((int)Math.round(cart.getTotal_price() / cart.getPrice()));
+			}
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return cart;
+	}
+
+	private void deleteDuplicateCartRows(int uid, int bid, int keepCid) {
+
+		try {
+
+			String sql = "delete from cart where uid=? and bid=? and cid<>?";
+
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, uid);
+			ps.setInt(2, bid);
+			ps.setInt(3, keepCid);
+			ps.executeUpdate();
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
 	}
 }
