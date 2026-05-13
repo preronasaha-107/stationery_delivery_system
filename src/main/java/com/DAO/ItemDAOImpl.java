@@ -66,12 +66,10 @@ public class ItemDAOImpl implements ItemDAO {
         List<itemdtls> list =
                 new ArrayList<itemdtls>();
 
-        itemdtls i = null;
-
         try {
 
             String sql =
-                    "select * from itemdtl";
+                    "select * from itemdtl order by item_id desc";
 
             PreparedStatement ps =
                     conn.prepareStatement(sql);
@@ -81,18 +79,39 @@ public class ItemDAOImpl implements ItemDAO {
 
             while(rs.next()) {
 
-                i = new itemdtls();
+                list.add(mapItem(rs));
+            }
 
-                i.setItem_id(rs.getInt(1));
-                i.setItem_name(rs.getString(2));
-                i.setItem_quantity(rs.getInt(3));
-                i.setPrice(rs.getString(4));
-                i.setCategory(rs.getString(5));
-                i.setItem_status(rs.getString(6));
-                i.setPhotoname(rs.getString(7));
-                i.setEmail(rs.getString(8));
+        } catch (Exception e) {
 
-                list.add(i);
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<itemdtls> getLatestItems(int limit) {
+
+        List<itemdtls> list =
+                new ArrayList<itemdtls>();
+
+        try {
+
+            String sql =
+                    "select * from itemdtl order by item_id desc limit ?";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setInt(1, limit);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()) {
+
+                list.add(mapItem(rs));
             }
 
         } catch (Exception e) {
@@ -112,9 +131,10 @@ public class ItemDAOImpl implements ItemDAO {
             if(keyword == null) {
                 keyword = "";
             }
+            keyword = keyword.trim();
 
             String sql =
-                    "select * from itemdtl where lower(item_name) like ? or lower(category) like ? order by item_id desc";
+                    "select * from itemdtl where lower(item_name) like ? or lower(category) like ? or lower(item_status) like ? order by item_id desc";
 
             PreparedStatement ps =
                     conn.prepareStatement(sql);
@@ -122,24 +142,14 @@ public class ItemDAOImpl implements ItemDAO {
             String search = "%" + keyword.toLowerCase() + "%";
             ps.setString(1, search);
             ps.setString(2, search);
+            ps.setString(3, search);
 
             ResultSet rs =
                     ps.executeQuery();
 
             while(rs.next()) {
 
-                itemdtls i = new itemdtls();
-
-                i.setItem_id(rs.getInt(1));
-                i.setItem_name(rs.getString(2));
-                i.setItem_quantity(rs.getInt(3));
-                i.setPrice(rs.getString(4));
-                i.setCategory(rs.getString(5));
-                i.setItem_status(rs.getString(6));
-                i.setPhotoname(rs.getString(7));
-                i.setEmail(rs.getString(8));
-
-                list.add(i);
+                list.add(mapItem(rs));
             }
 
         } catch (Exception e) {
@@ -161,15 +171,7 @@ public class ItemDAOImpl implements ItemDAO {
 		        ResultSet rs=ps.executeQuery();
 		        while(rs.next())
 		        {   
-		        	i=new itemdtls();
-		        	i.setItem_id(rs.getInt(1));
-	                i.setItem_name(rs.getString(2));
-	                i.setItem_quantity(rs.getInt(3));
-	                i.setPrice(rs.getString(4));
-	                i.setCategory(rs.getString(5));
-	                i.setItem_status(rs.getString(6));
-	                i.setPhotoname(rs.getString(7));
-	                i.setEmail(rs.getString(8));
+		        	i=mapItem(rs);
 		        }
 
 		    } catch (Exception e) {
@@ -238,5 +240,21 @@ public class ItemDAOImpl implements ItemDAO {
 	    return f;
 	
 	}
+
+    private itemdtls mapItem(ResultSet rs) throws Exception {
+
+        itemdtls i = new itemdtls();
+
+        i.setItem_id(rs.getInt(1));
+        i.setItem_name(rs.getString(2));
+        i.setItem_quantity(rs.getInt(3));
+        i.setPrice(rs.getString(4));
+        i.setCategory(rs.getString(5));
+        i.setItem_status(rs.getString(6));
+        i.setPhotoname(rs.getString(7));
+        i.setEmail(rs.getString(8));
+
+        return i;
+    }
 
 }

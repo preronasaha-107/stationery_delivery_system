@@ -10,6 +10,7 @@ public interface ItemDAO {
     public boolean additems(itemdtls i);
 
     public List<itemdtls> getAllItems();
+    public List<itemdtls> getLatestItems(int limit);
     public List<itemdtls> searchItems(String keyword);
     
     public itemdtls getItemById(int id);

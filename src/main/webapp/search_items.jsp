@@ -11,6 +11,11 @@ if(query == null){
 	query = "";
 }
 query = query.trim();
+String displayQuery = query
+		.replace("&", "&amp;")
+		.replace("\"", "&quot;")
+		.replace("<", "&lt;")
+		.replace(">", "&gt;");
 
 ItemDAOImpl dao = new ItemDAOImpl(DBConnect.getConn());
 List<itemdtls> itemList = query.isEmpty() ? dao.getAllItems() : dao.searchItems(query);
@@ -35,9 +40,9 @@ background-color:#fcf7f7;
 <div class="container p-4">
 
 <h3 class="text-center mb-4">
-Search Results
+<%=query.isEmpty() ? "All Items" : "Search Results"%>
 <% if(!query.isEmpty()){ %>
-for "<%=query%>"
+for "<%=displayQuery%>"
 <% } %>
 </h3>
 
@@ -56,6 +61,8 @@ if(itemList.isEmpty()){
 <div class="row">
 <%
 for(itemdtls i : itemList){
+	boolean inStock = i.getItem_quantity() > 0
+			&& "Available".equalsIgnoreCase(i.getItem_status());
 %>
 <div class="col-md-3 mb-4">
 <div class="card crd-ho h-100">
@@ -64,12 +71,17 @@ for(itemdtls i : itemList){
 style="width:180px;height:180px" class="img-thumblin">
 <p class="mt-2 mb-1"><%=i.getItem_name()%></p>
 <p class="mb-1">Category: <%=i.getCategory()%></p>
+<p class="mb-1">Status: <%=i.getItem_status()%></p>
 <p class="mb-3">In Stock: <%=i.getItem_quantity()%></p>
 
+<% if(inStock){ %>
 <a href="view_items.jsp?id=<%=i.getItem_id()%>"
 class="btn btn-danger btn-sm ml-1">
 Add Cart
 </a>
+<% } else { %>
+<span class="btn btn-secondary btn-sm ml-1 disabled">Unavailable</span>
+<% } %>
 <a href="view_items.jsp?id=<%=i.getItem_id()%>"
 class="btn btn-success btn-sm ml-1">
 View Details

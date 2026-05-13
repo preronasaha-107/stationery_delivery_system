@@ -25,8 +25,10 @@ CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());
 List<Cart> cartList = dao.getCartByUser(uid);
 
 double subtotal = 0.0;
+int totalItems = 0;
 for(Cart c : cartList){
 	subtotal += c.getTotal_price();
+	totalItems += c.getQuantity();
 }
 double deliveryCharge = subtotal > 0 ? 0.0 : 0.0;
 double grandTotal = subtotal + deliveryCharge;
@@ -133,6 +135,13 @@ Remove
 <div class="card-body">
 
 <h4 class="text-center text-success mb-4">Order Summary</h4>
+
+<div class="d-flex justify-content-between">
+<span>Total Items</span>
+<strong><%=totalItems%></strong>
+</div>
+
+<hr>
 
 <div class="d-flex justify-content-between">
 <span>Subtotal</span>
