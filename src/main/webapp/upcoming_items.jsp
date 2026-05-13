@@ -16,15 +16,15 @@ List<itemdtls> itemList = dao.getItemsByStatus("Not Available");
 <title>Upcoming Items</title>
 <%@include file="all_component/allCSS.jsp"%>
 <style>
-body{background:#f7f9fc;}
-.item-card{border:none;border-radius:16px;box-shadow:0 12px 32px rgba(15,23,42,0.08);}
-.item-img{width:100%;height:220px;object-fit:cover;border-radius:12px;background:#eef2f7;}
+body{background-color:#f7f7f7;}
+.item-card{border:1px solid #dee2e6;}
+.item-img{width:100%;height:220px;object-fit:cover;background:#f8f9fa;}
 </style>
 </head>
 <body>
 <%@include file="all_component/navbar.jsp"%>
 <div class="container py-5">
-<div class="text-center mb-5">
+<div class="text-center mb-4">
 <h2 class="font-weight-bold text-dark">Upcoming Items</h2>
 <p class="text-muted mb-0">Products marked not available right now, but expected to arrive soon.</p>
 </div>

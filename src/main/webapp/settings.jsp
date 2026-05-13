@@ -11,8 +11,8 @@ User settingsUser = (User)session.getAttribute("userobj");
 <title>Settings</title>
 <%@include file="all_component/allCSS.jsp"%>
 <style>
-body{background:#f5f7fb;}
-.settings-card{border:none;border-radius:16px;box-shadow:0 12px 30px rgba(15,23,42,0.08);}
+body{background-color:#f0f1f2;}
+.settings-card{border:1px solid #dee2e6;}
 </style>
 </head>
 <body>
