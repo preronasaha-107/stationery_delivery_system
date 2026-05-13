@@ -25,23 +25,21 @@ public class CartServlet extends HttpServlet {
 			throws ServletException, IOException {
 
 		int iid = 0;
-		int uid = 1;
+		int uid = 0;
 
 		try {
 
 			iid =
 			Integer.parseInt(req.getParameter("iid"));
 
-			String uidParam = req.getParameter("uid");
-			if(uidParam != null && !uidParam.trim().isEmpty()) {
-				uid = Integer.parseInt(uidParam);
-			}
-
 			HttpSession session = req.getSession();
 			User loginUser = (User)session.getAttribute("userobj");
-			if(loginUser != null) {
-				uid = loginUser.getId();
+			if(loginUser == null) {
+				session.setAttribute("failedMsg", "Please login before adding items to the cart.");
+				resp.sendRedirect("login.jsp");
+				return;
 			}
+			uid = loginUser.getId();
 
 			int quantity = 1;
 			String qtyParam = req.getParameter("quantity");

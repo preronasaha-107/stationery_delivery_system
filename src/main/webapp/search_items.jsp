@@ -4,6 +4,7 @@
 <%@page import="com.entity.itemdtls"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@include file="all_component/item_helpers.jsp" %>
 
 <%
 String query = request.getParameter("query");
@@ -67,7 +68,7 @@ for(itemdtls i : itemList){
 <div class="col-md-3 mb-4">
 <div class="card crd-ho h-100">
 <div class="card-body text-center">
-<img alt="<%=i.getItem_name()%>" src="recent/<%=i.getPhotoname()%>"
+<img alt="<%=i.getItem_name()%>" src="<%=resolveImagePath(application, i.getPhotoname())%>"
 style="width:180px;height:180px" class="img-thumblin">
 <p class="mt-2 mb-1"><%=i.getItem_name()%></p>
 <p class="mb-1">Category: <%=i.getCategory()%></p>

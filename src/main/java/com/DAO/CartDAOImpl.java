@@ -124,6 +124,29 @@ public class CartDAOImpl implements CartDAO {
 	}
 
 	@Override
+	public boolean clearCartByUser(int uid) {
+
+		boolean f = false;
+
+		try {
+
+			String sql = "delete from cart where uid=?";
+
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setInt(1, uid);
+
+			ps.executeUpdate();
+			f = true;
+
+		} catch (Exception e) {
+
+			e.printStackTrace();
+		}
+
+		return f;
+	}
+
+	@Override
 	public int getCartItemQuantity(int uid, int bid) {
 
 		int quantity = 0;

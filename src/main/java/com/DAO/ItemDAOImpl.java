@@ -123,6 +123,71 @@ public class ItemDAOImpl implements ItemDAO {
     }
 
     @Override
+    public List<itemdtls> getRecommendedItems(int limit) {
+
+        List<itemdtls> list =
+                new ArrayList<itemdtls>();
+
+        try {
+
+            String sql =
+                    "select * from itemdtl where item_status=? and item_quantity > 0 order by item_quantity desc, item_id desc limit ?";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setString(1, "Available");
+            ps.setInt(2, limit);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()) {
+
+                list.add(mapItem(rs));
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    @Override
+    public List<itemdtls> getItemsByStatus(String status) {
+
+        List<itemdtls> list =
+                new ArrayList<itemdtls>();
+
+        try {
+
+            String sql =
+                    "select * from itemdtl where item_status=? order by item_id desc";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setString(1, status);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()) {
+
+                list.add(mapItem(rs));
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    @Override
     public List<itemdtls> searchItems(String keyword) {
 
         List<itemdtls> list = new ArrayList<itemdtls>();

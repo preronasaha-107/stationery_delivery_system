@@ -20,20 +20,18 @@ public class RemoveCartServlet extends HttpServlet {
 	protected void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws ServletException, IOException {
 
-		int uid = 1;
+		int uid = 0;
 
 		try {
 			int cid = Integer.parseInt(req.getParameter("cid"));
 
-			String uidParam = req.getParameter("uid");
-			if(uidParam != null && !uidParam.trim().isEmpty()) {
-				uid = Integer.parseInt(uidParam);
-			}
-
 			User loginUser = (User)req.getSession().getAttribute("userobj");
-			if(loginUser != null) {
-				uid = loginUser.getId();
+			if(loginUser == null) {
+				req.getSession().setAttribute("failedMsg", "Please login before updating your cart.");
+				resp.sendRedirect("login.jsp");
+				return;
 			}
+			uid = loginUser.getId();
 
 			CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());
 			boolean f = dao.deleteCart(cid, uid);

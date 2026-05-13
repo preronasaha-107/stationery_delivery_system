@@ -5,6 +5,7 @@
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@include file="all_component/item_helpers.jsp" %>
 
 <%
 int id = 0;
@@ -24,11 +25,7 @@ if(b == null){
 	return;
 }
 
-int uid = 1;
 User loginUser = (User)session.getAttribute("userobj");
-if(loginUser != null){
-	uid = loginUser.getId();
-}
 %>
 
 <!DOCTYPE html>
@@ -80,8 +77,8 @@ session.removeAttribute("failedMsg");
 
 <div class="col-md-6 text-center p-5 border bg-white">
 
-<img src="recent/<%=b.getPhotoname()%>"
-style="height:220px;width:220px"><br>
+<img src="<%=resolveImagePath(application, b.getPhotoname())%>"
+style="height:220px;width:220px;object-fit:cover;"><br>
 
 <h4 class="mt-3">
 Item Name :
@@ -155,7 +152,6 @@ Single Item Price :
 
 <form action="cart" method="get" class="form-inline justify-content-center">
 <input type="hidden" name="iid" value="<%=b.getItem_id()%>">
-<input type="hidden" name="uid" value="<%=uid%>">
 
 <label class="mr-2" for="quantity">Items</label>
 <input type="number" id="quantity" name="quantity"
@@ -163,6 +159,12 @@ class="form-control mr-2" style="width:100px;"
 min="1" max="<%=b.getItem_quantity()%>" value="1"
 <%=b.getItem_quantity() <= 0 ? "disabled" : ""%>>
 
+<% if(loginUser == null){ %>
+<a href="login.jsp" class="btn btn-warning mr-2">
+<i class="fas fa-right-to-bracket"></i>
+Login To Buy
+</a>
+<% } else { %>
 <button type="submit"
 class="btn btn-danger mr-2"
 <%=b.getItem_quantity() <= 0 ? "disabled" : ""%>>
@@ -170,6 +172,7 @@ class="btn btn-danger mr-2"
 <i class="fas fa-cart-plus"></i>
 Add Cart
 </button>
+<% } %>
 
 <span class="btn btn-success">
 &#8377; <%=b.getPrice()%>

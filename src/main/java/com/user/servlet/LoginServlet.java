@@ -13,6 +13,8 @@ import com.DAO.UserDAOImpl;
 import com.DB.DBConnect;
 import com.entity.User;
 
+import java.sql.Connection;
+
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
 
@@ -20,16 +22,21 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String email = request.getParameter("email");
-        String password = request.getParameter("password");
+        String email = safeTrim(request.getParameter("email")).toLowerCase();
+        String password = safeTrim(request.getParameter("password"));
 
         HttpSession session = request.getSession();
+
+        session.removeAttribute("failedMsg");
+        session.removeAttribute("succMsg");
 
         String adminEmail = "admin@gmail.com";
         String adminPassword = "admin";
 
         if (adminEmail.equals(email) && adminPassword.equals(password)) {
 
+            session.removeAttribute("userobj");
+            session.removeAttribute("userEmail");
             session.setAttribute("user", "admin");
             session.setAttribute("adminEmail", email);
 
@@ -37,21 +44,40 @@ public class LoginServlet extends HttpServlet {
             return;
         }
 
-        UserDAOImpl dao = new UserDAOImpl(DBConnect.getConn());
+        if(email.isEmpty() || password.isEmpty()) {
+            session.setAttribute("failedMsg", "Please enter both email and password");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        Connection conn = DBConnect.getConn();
+        if(conn == null) {
+            session.setAttribute("failedMsg", "User login is unavailable because the database connection could not be established.");
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        UserDAOImpl dao = new UserDAOImpl(conn);
         User us = dao.login(email, password);
 
         if (us != null) {
 
+            session.removeAttribute("adminEmail");
             session.setAttribute("user", "normal");
             session.setAttribute("userobj", us);
             session.setAttribute("userEmail", us.getEmail());
+            session.setAttribute("succMsg", "Welcome back, " + us.getName() + "!");
 
-            response.sendRedirect("index.jsp");
+            response.sendRedirect("home.jsp");
 
         } else {
 
             session.setAttribute("failedMsg", "Invalid email or password");
             response.sendRedirect("login.jsp");
         }
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
     }
 }

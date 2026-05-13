@@ -7,19 +7,13 @@
 	pageEncoding="UTF-8"%>
 
 <%
-int uid = 1;
 User loginUser = (User)session.getAttribute("userobj");
-if(loginUser != null){
-	uid = loginUser.getId();
+if(loginUser == null){
+	session.setAttribute("failedMsg", "Please login to view your cart.");
+	response.sendRedirect("login.jsp");
+	return;
 }
-String uidParam = request.getParameter("uid");
-if(loginUser == null && uidParam != null && !uidParam.trim().isEmpty()){
-	try{
-		uid = Integer.parseInt(uidParam);
-	} catch(Exception e){
-		uid = 1;
-	}
-}
+int uid = loginUser.getId();
 
 CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());
 List<Cart> cartList = dao.getCartByUser(uid);
@@ -111,7 +105,7 @@ for(Cart c : cartList){
 <td class="text-right">&#8377; <%=String.format("%.2f", c.getPrice())%></td>
 <td class="text-right">&#8377; <%=String.format("%.2f", c.getTotal_price())%></td>
 <td class="text-center">
-<a href="remove_cart?cid=<%=c.getCid()%>&uid=<%=uid%>"
+<a href="remove_cart?cid=<%=c.getCid()%>"
 class="btn btn-sm btn-outline-danger">
 Remove
 </a>
@@ -164,10 +158,10 @@ Remove
 
 <a href="index.jsp" class="btn btn-primary btn-block mt-4">Continue Shopping</a>
 
-<button class="btn btn-success btn-block mt-2"
-<%=cartList.isEmpty() ? "disabled" : ""%>>
+<a href="checkout.jsp"
+class="btn btn-success btn-block mt-2 <%=cartList.isEmpty() ? "disabled" : ""%>">
 Proceed To Checkout
-</button>
+</a>
 
 </div>
 </div>
