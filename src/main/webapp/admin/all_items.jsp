@@ -5,6 +5,7 @@
 <%@page import="com.DAO.ItemDAOImpl"%>
 <%@page import="com.DB.DBConnect"%>
 <%@page import="com.entity.itemdtls"%>
+<%@include file="../all_component/item_helpers.jsp" %>
 
 <!DOCTYPE html>
 <html>
@@ -83,7 +84,7 @@ for(itemdtls i : list){
 
 <td class="text-center align-middle">
 
-    <img src="../recent/<%=i.getPhotoname()%>"
+    <img src="../<%=resolveImagePath(application, i.getPhotoname())%>"
     
          style="
          width:160px;

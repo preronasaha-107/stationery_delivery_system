@@ -22,11 +22,10 @@ public class RegisterServlet extends HttpServlet {
 
         try {
 
-            String name = req.getParameter("fname");
-
-            String email = req.getParameter("email");
-            String phno = req.getParameter("phno");
-            String password = req.getParameter("password");
+            String name = safeTrim(req.getParameter("fname"));
+            String email = safeTrim(req.getParameter("email")).toLowerCase();
+            String phno = safeTrim(req.getParameter("phno"));
+            String password = safeTrim(req.getParameter("password"));
             String check = req.getParameter("check");
 
             User us = new User();
@@ -38,10 +37,28 @@ public class RegisterServlet extends HttpServlet {
 
             HttpSession session = req.getSession();
 
+            if(name.isEmpty() || email.isEmpty() || phno.isEmpty() || password.isEmpty()) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Please fill in all registration details");
+
+                resp.sendRedirect("register.jsp");
+                return;
+            }
+
             if(check != null) {
 
                 UserDAOImpl dao =
                         new UserDAOImpl(DBConnect.getConn());
+
+                if(dao.userExists(email)) {
+                    session.setAttribute(
+                            "failedMsg",
+                            "An account with this email already exists");
+
+                    resp.sendRedirect("register.jsp");
+                    return;
+                }
 
                 boolean f = dao.userRegister(us);
 
@@ -79,5 +96,9 @@ public class RegisterServlet extends HttpServlet {
                     "Something went wrong");
             resp.sendRedirect("register.jsp");
         }
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
     }
 }

@@ -17,6 +17,9 @@ public class UserDAOImpl implements UserDAO {
     public boolean userRegister(User us) {
         boolean f = false;
         try {
+            if(userExists(us.getEmail())) {
+                return false;
+            }
             String sql = "insert into user(name,email,phno,password) values(?,?,?,?)";
             PreparedStatement ps = conn.prepareStatement(sql);
             ps.setString(1, us.getName());
@@ -40,9 +43,9 @@ public class UserDAOImpl implements UserDAO {
 		   
 
 		    try {
-		        String sql="select * from user where email=? and password=?";
+		        String sql="select * from user where lower(trim(email))=? and password=? limit 1";
 		        PreparedStatement ps=conn.prepareStatement(sql);
-		        ps.setString(1, email);
+		        ps.setString(1, email == null ? "" : email.trim().toLowerCase());
 		        ps.setString(2, password);
 
 		        ResultSet rs=ps.executeQuery();
@@ -67,6 +70,25 @@ public class UserDAOImpl implements UserDAO {
 
 		  return us;
 		}
+
+	@Override
+	public boolean userExists(String email) {
+		boolean exists = false;
+
+		try {
+			String sql = "select 1 from user where lower(trim(email))=? limit 1";
+			PreparedStatement ps = conn.prepareStatement(sql);
+			ps.setString(1, email == null ? "" : email.trim().toLowerCase());
+
+			ResultSet rs = ps.executeQuery();
+			exists = rs.next();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		return exists;
+	}
 
 	private String getOptionalString(ResultSet rs, String columnName) {
 		try {
