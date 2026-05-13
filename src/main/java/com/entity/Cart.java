@@ -8,6 +8,7 @@ public class Cart {
 	private String itemname;
 	private double price;
 	private double total_price;
+	private int quantity;
 
 	public Cart() {
 		super();
@@ -59,5 +60,13 @@ public class Cart {
 
 	public void setTotal_price(double total_price) {
 		this.total_price = total_price;
+	}
+
+	public int getQuantity() {
+		return quantity;
+	}
+
+	public void setQuantity(int quantity) {
+		this.quantity = quantity;
 	}
 }
