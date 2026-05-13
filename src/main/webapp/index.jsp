@@ -44,7 +44,7 @@ background-color:#fcf7f7;
   
                 <div class="row ">
                 
-                    <a href="cart?iid=3&uid=1"
+                    <a href="view_items.jsp?id=3"
 class="btn btn-danger btn-sm ml-1">
 
 
@@ -71,7 +71,7 @@ View Details
   
                 <div class="row ">
                 
-                    <a href="cart?iid=4&uid=2"
+                    <a href="view_items.jsp?id=4"
 class="btn btn-danger btn-sm ml-1">
 
 
@@ -100,7 +100,7 @@ View Details
   
                 <div class="row ">
                 
-                    <a href="cart?iid=5&uid=3"
+                    <a href="view_items.jsp?id=5"
 class="btn btn-danger btn-sm ml-1">
 
 
@@ -128,7 +128,7 @@ View Details
   
                 <div class="row ">
                 
-                    <a href="cart?iid=6&uid=4"
+                    <a href="view_items.jsp?id=6"
 class="btn btn-danger btn-sm ml-1">
 
 <i class="fa-solid fa-cart-arrow-down"></i>
@@ -169,14 +169,14 @@ View Details
   
                 <div class="row ">
                 
-                    <a href="cart?iid=3&uid=5"
+                    <a href="view_items.jsp?id=3"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="view_items.jsp?id=3" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; 700
 </a>                 
@@ -193,14 +193,14 @@ Add Cart
   
                 <div class="row ">
                 
-                    <a href="cart?iid=4&uid=6"
+                    <a href="view_items.jsp?id=4"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="view_items.jsp?id=4" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; 700
 </a>                 
@@ -218,14 +218,14 @@ Add Cart
   
                 <div class="row ">
                 
-                    <a href="cart?iid=5&uid=7"
+                    <a href="view_items.jsp?id=5"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="view_items.jsp?id=5" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; 700
 </a>                 
@@ -244,14 +244,14 @@ Add Cart
   
                 <div class="row ">
                 
-                   <a href="cart?iid=6&uid=8"
+                   <a href="view_items.jsp?id=6"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-1">View Details</a>
+                    <a href="view_items.jsp?id=6" class="btn btn-success btn-sm ml-1">View Details</a>
                     <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; &#8377;
 </a>                  
@@ -282,14 +282,14 @@ Add Cart
   
                 <div class="row ">
                 
-                    <a href="cart?iid=3&uid=9"
+                    <a href="view_items.jsp?id=3"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-2">View Details</a>
+                    <a href="view_items.jsp?id=3" class="btn btn-success btn-sm ml-2">View Details</a>
                      <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; &#8377; 
 </a>               
@@ -307,14 +307,14 @@ Add Cart
   
                 <div class="row ">
                 
-                    <a href="cart?iid=4&uid=10"
+                    <a href="view_items.jsp?id=4"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-2">View Details</a>
+                    <a href="view_items.jsp?id=4" class="btn btn-success btn-sm ml-2">View Details</a>
                      <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; &#8377; 
 </a>               
@@ -333,14 +333,14 @@ Add Cart
   
                 <div class="row ">
                 
-                   <a href="cart?iid=5&uid=11"
+                   <a href="view_items.jsp?id=5"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-2">View Details</a>
+                    <a href="view_items.jsp?id=5" class="btn btn-success btn-sm ml-2">View Details</a>
                      <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; &#8377; 
 </a>               
@@ -360,14 +360,14 @@ Add Cart
   
                 <div class="row ">
                 
-                    <a href="cart?iid=6&uid=13"
+                    <a href="view_items.jsp?id=6"
 class="btn btn-danger btn-sm ml-1">
 
 
 Add Cart
 
 </a>
-                    <a href="" class="btn btn-success btn-sm ml-2">View Details</a>
+                    <a href="view_items.jsp?id=6" class="btn btn-success btn-sm ml-2">View Details</a>
                      <a href="" class="btn btn-danger btn-sm ml-1">
 &#8377; &#8377; 
 </a>               

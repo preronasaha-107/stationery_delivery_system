@@ -103,6 +103,53 @@ public class ItemDAOImpl implements ItemDAO {
         return list;
     }
 
+    @Override
+    public List<itemdtls> searchItems(String keyword) {
+
+        List<itemdtls> list = new ArrayList<itemdtls>();
+
+        try {
+            if(keyword == null) {
+                keyword = "";
+            }
+
+            String sql =
+                    "select * from itemdtl where lower(item_name) like ? or lower(category) like ? order by item_id desc";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            String search = "%" + keyword.toLowerCase() + "%";
+            ps.setString(1, search);
+            ps.setString(2, search);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()) {
+
+                itemdtls i = new itemdtls();
+
+                i.setItem_id(rs.getInt(1));
+                i.setItem_name(rs.getString(2));
+                i.setItem_quantity(rs.getInt(3));
+                i.setPrice(rs.getString(4));
+                i.setCategory(rs.getString(5));
+                i.setItem_status(rs.getString(6));
+                i.setPhotoname(rs.getString(7));
+                i.setEmail(rs.getString(8));
+
+                list.add(i);
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
 	@Override
 	public itemdtls getItemById(int id) {
 		    itemdtls i=null;

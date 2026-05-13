@@ -7,6 +7,7 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import com.DAO.CartDAOImpl;
 import com.DAO.ItemDAOImpl;
@@ -22,16 +23,22 @@ public class CartServlet extends HttpServlet {
 			HttpServletResponse resp)
 			throws ServletException, IOException {
 
+		int iid = 0;
+		int uid = 1;
+
 		try {
 
-			int iid =
+			iid =
 			Integer.parseInt(req.getParameter("iid"));
 
-			int uid =
+			uid =
 			Integer.parseInt(req.getParameter("uid"));
 
-			System.out.println(iid);
-			System.out.println(uid);
+			int quantity = 1;
+			String qtyParam = req.getParameter("quantity");
+			if(qtyParam != null && !qtyParam.trim().isEmpty()) {
+				quantity = Integer.parseInt(qtyParam);
+			}
 
 			ItemDAOImpl dao =
 			new ItemDAOImpl(DBConnect.getConn());
@@ -41,16 +48,52 @@ public class CartServlet extends HttpServlet {
 
 			if(i == null) {
 
-				System.out.println("ITEM NULL");
-
 				resp.sendRedirect("index.jsp");
 
 				return;
 			}
 
-			System.out.println(i.getItem_name());
-             System.out.println(i.getPrice());		
-             Cart c = new Cart();
+			HttpSession session = req.getSession();
+
+			if(quantity < 1) {
+				session.setAttribute("failedMsg", "Please select at least 1 item.");
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+				return;
+			}
+
+			if(i.getItem_quantity() <= 0) {
+				session.setAttribute("failedMsg", "This item is currently out of stock.");
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+				return;
+			}
+
+			if(quantity > i.getItem_quantity()) {
+				session.setAttribute("failedMsg", "Only " + i.getItem_quantity() + " item(s) are available in stock.");
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+				return;
+			}
+
+			CartDAOImpl dao2 =
+			new CartDAOImpl(DBConnect.getConn());
+
+			int alreadyInCart = dao2.getCartItemQuantity(uid, iid);
+			int remainingStock = i.getItem_quantity() - alreadyInCart;
+
+			if(remainingStock <= 0) {
+				session.setAttribute("failedMsg", "You already have all available stock for this item in your cart.");
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+				return;
+			}
+
+			if(quantity > remainingStock) {
+				session.setAttribute("failedMsg", "You already have " + alreadyInCart + " item(s) in your cart. Only " + remainingStock + " more can be added.");
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+				return;
+			}
+
+			double itemPrice = Double.parseDouble(i.getPrice());
+
+			Cart c = new Cart();
 
 			c.setBid(iid);
 
@@ -58,26 +101,23 @@ public class CartServlet extends HttpServlet {
 
 			c.setItemname(i.getItem_name());
 
-			c.setPrice(
-			Double.parseDouble(i.getPrice()));
+			c.setPrice(itemPrice);
 
-			c.setTotal_price(
-			Double.parseDouble(i.getPrice()));
+			c.setQuantity(quantity);
 
-			CartDAOImpl dao2 =
-			new CartDAOImpl(DBConnect.getConn());
+			c.setTotal_price(itemPrice * quantity);
 
 			boolean f = dao2.addCart(c);
 
 			if(f) {
 
-				System.out.println("SUCCESS");
+				session.setAttribute("succMsg", "Item added to cart successfully.");
 
-				resp.sendRedirect("cart.jsp");
+				resp.sendRedirect("cart.jsp?uid=" + uid);
 
 			} else {
 
-				System.out.println("FAILED");
+				session.setAttribute("failedMsg", "Failed to add item to cart.");
 
 				resp.sendRedirect("index.jsp");
 			}
@@ -85,6 +125,12 @@ public class CartServlet extends HttpServlet {
 		} catch (Exception e) {
 
 			e.printStackTrace();
+			req.getSession().setAttribute("failedMsg", "Unable to add item to cart.");
+			if(iid > 0) {
+				resp.sendRedirect("view_items.jsp?id=" + iid);
+			} else {
+				resp.sendRedirect("index.jsp");
+			}
 		}
 	}
 }

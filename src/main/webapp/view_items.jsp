@@ -35,6 +35,29 @@ box-shadow:0 0 8px 0 rgba(0,0,0,0.3);
 
 <div class="container p-5">
 
+<%
+String succMsg = (String)session.getAttribute("succMsg");
+String failedMsg = (String)session.getAttribute("failedMsg");
+
+if(succMsg != null){
+%>
+<div class="alert alert-success text-center" role="alert">
+<%=succMsg%>
+</div>
+<%
+session.removeAttribute("succMsg");
+}
+
+if(failedMsg != null){
+%>
+<div class="alert alert-danger text-center" role="alert">
+<%=failedMsg%>
+</div>
+<%
+session.removeAttribute("failedMsg");
+}
+%>
+
 <div class="row">
 
 <div class="col-md-6 text-center p-5 border bg-white">
@@ -80,8 +103,15 @@ This stationery item is available in excellent quality.
 </p>
 
 <p>
-Quantity :
+Items Available In Stock :
 <%=b.getItem_quantity()%>
+</p>
+
+<p>
+Single Item Price :
+<span class="text-danger font-weight-bold">
+&#8377; <%=b.getPrice()%>
+</span>
 </p>
 
 <div class="row">
@@ -105,19 +135,28 @@ Quantity :
 
 <div class="text-center p-3">
 
-<a href="cart?iid=<%=b.getItem_id()%>&uid=1"
-class="btn btn-danger">
+<form action="cart" method="get" class="form-inline justify-content-center">
+<input type="hidden" name="iid" value="<%=b.getItem_id()%>">
+<input type="hidden" name="uid" value="1">
+
+<label class="mr-2" for="quantity">Items</label>
+<input type="number" id="quantity" name="quantity"
+class="form-control mr-2" style="width:100px;"
+min="1" max="<%=b.getItem_quantity()%>" value="1"
+<%=b.getItem_quantity() <= 0 ? "disabled" : ""%>>
+
+<button type="submit"
+class="btn btn-danger mr-2"
+<%=b.getItem_quantity() <= 0 ? "disabled" : ""%>>
 
 <i class="fas fa-cart-plus"></i>
 Add Cart
-</a>
+</button>
 
-<a href=""
-class="btn btn-success">
-
+<span class="btn btn-success">
 &#8377; <%=b.getPrice()%>
-
-</a>
+</span>
+</form>
 
 </div>
 
