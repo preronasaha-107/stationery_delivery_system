@@ -41,6 +41,19 @@ public class EditItemServlet extends HttpServlet {
             String status =
             req.getParameter("status");
 
+            HttpSession session =
+            req.getSession();
+
+            if(quantity < 0) {
+                session.setAttribute(
+                "failedMsg",
+                "Item quantity cannot be negative");
+
+                resp.sendRedirect(
+                "admin/edit_items.jsp?id="+id);
+                return;
+            }
+
             itemdtls i = new itemdtls();
 
             i.setItem_id(id);
@@ -60,9 +73,6 @@ public class EditItemServlet extends HttpServlet {
 
             boolean f =
             dao.updateEditItems(i);
-
-            HttpSession session =
-            req.getSession();
 
             if(f){
 
@@ -86,6 +96,11 @@ public class EditItemServlet extends HttpServlet {
         } catch (Exception e) {
 
             e.printStackTrace();
+            req.getSession().setAttribute(
+            "failedMsg",
+            "Something went wrong");
+            resp.sendRedirect(
+            "admin/all_items.jsp");
         }
     }
 }

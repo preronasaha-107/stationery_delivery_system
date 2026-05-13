@@ -49,6 +49,29 @@ public class ItemsAdd extends HttpServlet {
             String fileName =
                     part.getSubmittedFileName();
 
+            HttpSession session =
+                    req.getSession();
+
+            if(item_quantity < 0) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Item quantity cannot be negative");
+
+                resp.sendRedirect(
+                        "admin/add_items.jsp");
+                return;
+            }
+
+            if(fileName == null || fileName.trim().isEmpty()) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Please upload an item photo");
+
+                resp.sendRedirect(
+                        "admin/add_items.jsp");
+                return;
+            }
+
             itemdtls i = new itemdtls(
 
                     item_name,
@@ -66,13 +89,13 @@ public class ItemsAdd extends HttpServlet {
             
             boolean f = dao.additems(i);
 
-            HttpSession session =
-                    req.getSession();
-
             if(f) {
-            String path = getServletContext().getRealPath("")+"recent";
+            String path = getServletContext().getRealPath("recent");
 
             File file = new File(path);
+            if(!file.exists()) {
+                file.mkdirs();
+            }
             part.write(path + File.separator + fileName);
 
 
@@ -96,6 +119,11 @@ public class ItemsAdd extends HttpServlet {
         } catch (Exception e) {
 
             e.printStackTrace();
+            req.getSession().setAttribute(
+                    "failedMsg",
+                    "Failed To Add Item");
+            resp.sendRedirect(
+                    "admin/add_items.jsp");
         }
     }
 }

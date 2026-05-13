@@ -2,22 +2,33 @@
 <%@page import="com.DAO.CartDAOImpl"%>
 <%@page import="com.DB.DBConnect"%>
 <%@page import="com.entity.Cart"%>
+<%@page import="com.entity.User"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
 	pageEncoding="UTF-8"%>
 
 <%
 int uid = 1;
+User loginUser = (User)session.getAttribute("userobj");
+if(loginUser != null){
+	uid = loginUser.getId();
+}
 String uidParam = request.getParameter("uid");
-if(uidParam != null && !uidParam.trim().isEmpty()){
-	uid = Integer.parseInt(uidParam);
+if(loginUser == null && uidParam != null && !uidParam.trim().isEmpty()){
+	try{
+		uid = Integer.parseInt(uidParam);
+	} catch(Exception e){
+		uid = 1;
+	}
 }
 
 CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());
 List<Cart> cartList = dao.getCartByUser(uid);
 
 double subtotal = 0.0;
+int totalItems = 0;
 for(Cart c : cartList){
 	subtotal += c.getTotal_price();
+	totalItems += c.getQuantity();
 }
 double deliveryCharge = subtotal > 0 ? 0.0 : 0.0;
 double grandTotal = subtotal + deliveryCharge;
@@ -124,6 +135,13 @@ Remove
 <div class="card-body">
 
 <h4 class="text-center text-success mb-4">Order Summary</h4>
+
+<div class="d-flex justify-content-between">
+<span>Total Items</span>
+<strong><%=totalItems%></strong>
+</div>
+
+<hr>
 
 <div class="d-flex justify-content-between">
 <span>Subtotal</span>

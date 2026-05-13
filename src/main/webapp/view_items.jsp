@@ -1,16 +1,34 @@
 <%@page import="com.DAO.ItemDAOImpl"%>
 <%@page import="com.DB.DBConnect"%>
+<%@page import="com.entity.User"%>
 <%@page import="com.entity.itemdtls"%>
 
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
 <%
-int id = Integer.parseInt(request.getParameter("id"));
+int id = 0;
+try{
+	id = Integer.parseInt(request.getParameter("id"));
+} catch(Exception e){
+	response.sendRedirect("index.jsp");
+	return;
+}
 
 ItemDAOImpl dao = new ItemDAOImpl(DBConnect.getConn());
 
 itemdtls b = dao.getItemById(id);
+
+if(b == null){
+	response.sendRedirect("index.jsp");
+	return;
+}
+
+int uid = 1;
+User loginUser = (User)session.getAttribute("userobj");
+if(loginUser != null){
+	uid = loginUser.getId();
+}
 %>
 
 <!DOCTYPE html>
@@ -137,7 +155,7 @@ Single Item Price :
 
 <form action="cart" method="get" class="form-inline justify-content-center">
 <input type="hidden" name="iid" value="<%=b.getItem_id()%>">
-<input type="hidden" name="uid" value="1">
+<input type="hidden" name="uid" value="<%=uid%>">
 
 <label class="mr-2" for="quantity">Items</label>
 <input type="number" id="quantity" name="quantity"

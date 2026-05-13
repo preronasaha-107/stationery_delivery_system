@@ -1,12 +1,17 @@
 package com.user.servlet;
 
 import java.io.IOException;
+
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+
+import com.DAO.UserDAOImpl;
+import com.DB.DBConnect;
+import com.entity.User;
 
 @WebServlet("/login")
 public class LoginServlet extends HttpServlet {
@@ -20,35 +25,33 @@ public class LoginServlet extends HttpServlet {
 
         HttpSession session = request.getSession();
 
-        // ✅ Hardcoded Admin Login
         String adminEmail = "admin@gmail.com";
         String adminPassword = "admin";
 
-        if (email.equals(adminEmail) && password.equals(adminPassword)) {
+        if (adminEmail.equals(email) && adminPassword.equals(password)) {
 
             session.setAttribute("user", "admin");
             session.setAttribute("adminEmail", email);
 
             response.sendRedirect("admin/home.jsp");
+            return;
         }
 
-        else {
+        UserDAOImpl dao = new UserDAOImpl(DBConnect.getConn());
+        User us = dao.login(email, password);
 
-            // 👉 Here you will later connect database login
-            // For now simple demo user validation
+        if (us != null) {
 
-            if (email.equals("user@gmail.com") && password.equals("user")) {
+            session.setAttribute("user", "normal");
+            session.setAttribute("userobj", us);
+            session.setAttribute("userEmail", us.getEmail());
 
-                session.setAttribute("user", "normal");
-                session.setAttribute("userEmail", email);
+            response.sendRedirect("index.jsp");
 
-                response.sendRedirect("index.jsp");
+        } else {
 
-            } else {
-
-                session.setAttribute("failedMsg", "Invalid email or password");
-                response.sendRedirect("login.jsp");
-            }
+            session.setAttribute("failedMsg", "Invalid email or password");
+            response.sendRedirect("login.jsp");
         }
     }
 }

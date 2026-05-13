@@ -50,15 +50,15 @@ public class UserDAOImpl implements UserDAO {
 		        {
 		            us=new User();
 		            us.setId(rs.getInt(1));
-		            us.setName(rs.getString(2));
-		            us.setEmail(rs.getString(3));
-		            us.setPhno(rs.getString(5));
-		            us.setPassword(rs.getString(4));
-		            us.setAddress(rs.getString(6));
-		            us.setLandmark(rs.getString(7));
-		            us.setCity(rs.getString(8));
-		            us.setState(rs.getString(9));
-		            us.setPincode(rs.getString(10));
+		            us.setName(rs.getString("name"));
+		            us.setEmail(rs.getString("email"));
+		            us.setPhno(rs.getString("phno"));
+		            us.setPassword(rs.getString("password"));
+		            us.setAddress(getOptionalString(rs, "address"));
+		            us.setLandmark(getOptionalString(rs, "landmark"));
+		            us.setCity(getOptionalString(rs, "city"));
+		            us.setState(getOptionalString(rs, "state"));
+		            us.setPincode(getOptionalString(rs, "pincode"));
 		        }
 		    
 		    } catch (Exception e) {
@@ -67,6 +67,14 @@ public class UserDAOImpl implements UserDAO {
 
 		  return us;
 		}
+
+	private String getOptionalString(ResultSet rs, String columnName) {
+		try {
+			return rs.getString(columnName);
+		} catch (Exception e) {
+			return null;
+		}
+	}
 		
 	}
     

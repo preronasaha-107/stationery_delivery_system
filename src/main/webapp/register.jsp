@@ -43,30 +43,30 @@ session.removeAttribute("failedMsg");
 }
 %>
                 <h4 class="text-center">Registration Page</h4>
-<form action="register"method="post">
+<form action="register" method="post">
   <div class="form-group">
     <label for="exampleInputEmail1">Enter Full Name:</label>
-    <input type="text"" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" 
+    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
     required="required" name="fname">
-    
-    
+
+
   </div>
   <div class="form-group">
     <label for="exampleInputEmail1">Phone no.</label>
-    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required="required"name="phno">
-    
+    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required="required" name="phno">
+
   </div>
   <div class="form-group">
     <label for="exampleInputEmail1">Email Address</label>
-    <input type="email"class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"required="required"name="email" >
-    
+    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required="required" name="email" >
+
   </div>
   <div class="form-group">
     <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1"required="required"name="password" >
+    <input type="password" class="form-control" id="exampleInputPassword1" required="required" name="password" >
   </div>
   <div class="form-check">
-    <input type="checkbox" class="form-check-input" id="exampleCheck1"required="required"name="check">
+    <input type="checkbox" class="form-check-input" id="exampleCheck1" required="required" name="check">
     <label class="form-check-label" for="exampleCheck1">Agree Terms & Conditions</label>
   </div>
   <button type="submit" class="btn btn-primary">Submit</button>

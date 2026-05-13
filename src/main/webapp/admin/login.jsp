@@ -4,7 +4,7 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Insert title here</title>
+<title>Admin Login</title>
 <%@include file="allCSS.jsp"%>
 </head>
 <body>
@@ -35,7 +35,7 @@ session.removeAttribute("failedMsg");
 %>
 
 <h4 class="text-center">Admin's Login Page</h4>
-						<form action="login"method="post">
+						<form action="../login" method="post">
 							<div class="form-group">
 								<label for="exampleInputEmail1">Email address</label> <input
 									type="email" class="form-control" id="exampleInputEmail1"
@@ -54,7 +54,7 @@ session.removeAttribute("failedMsg");
 							</div>
 							<div class="text-center">
 							<button type="submit" class="btn btn-primary ">Login</button><br>
-							<a href="register.jsp">Create Account</a>
+							<a href="../register.jsp">Create Account</a>
 							</div>
 						</form>
 						
