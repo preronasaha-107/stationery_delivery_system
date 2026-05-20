@@ -1,6 +1,7 @@
 package com.admin.servlet;
 
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -27,27 +28,48 @@ public class EditItemServlet extends HttpServlet {
             Integer.parseInt(req.getParameter("id"));
 
             String itemname =
-            req.getParameter("itemname");
+            safeTrim(req.getParameter("itemname"));
 
             int quantity =
             Integer.parseInt(req.getParameter("quantity"));
 
             String price =
-            req.getParameter("price");
+            safeTrim(req.getParameter("price"));
 
             String category =
-            req.getParameter("category");
+            safeTrim(req.getParameter("category"));
 
             String status =
-            req.getParameter("status");
+            safeTrim(req.getParameter("status"));
 
             HttpSession session =
             req.getSession();
+
+            if(itemname.isEmpty()) {
+                session.setAttribute(
+                "failedMsg",
+                "Item name is required");
+
+                resp.sendRedirect(
+                "admin/edit_items.jsp?id="+id);
+                return;
+            }
 
             if(quantity < 0) {
                 session.setAttribute(
                 "failedMsg",
                 "Item quantity cannot be negative");
+
+                resp.sendRedirect(
+                "admin/edit_items.jsp?id="+id);
+                return;
+            }
+
+            double parsedPrice = parsePrice(price);
+            if(parsedPrice < 0) {
+                session.setAttribute(
+                "failedMsg",
+                "Please enter a valid non-negative price");
 
                 resp.sendRedirect(
                 "admin/edit_items.jsp?id="+id);
@@ -62,7 +84,7 @@ public class EditItemServlet extends HttpServlet {
 
             i.setItem_quantity(quantity);
 
-            i.setPrice(price);
+            i.setPrice(String.format(Locale.US, "%.2f", parsedPrice));
 
             i.setCategory(category);
 
@@ -70,6 +92,16 @@ public class EditItemServlet extends HttpServlet {
 
             ItemDAOImpl dao =
             new ItemDAOImpl(DBConnect.getConn());
+
+            if(dao.itemNameExists(itemname, id)) {
+                session.setAttribute(
+                "failedMsg",
+                "Another item already uses this name. Please keep item names unique.");
+
+                resp.sendRedirect(
+                "admin/edit_items.jsp?id="+id);
+                return;
+            }
 
             boolean f =
             dao.updateEditItems(i);
@@ -101,6 +133,18 @@ public class EditItemServlet extends HttpServlet {
             "Something went wrong");
             resp.sendRedirect(
             "admin/all_items.jsp");
+        }
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private double parsePrice(String value) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return -1.0;
         }
     }
 }

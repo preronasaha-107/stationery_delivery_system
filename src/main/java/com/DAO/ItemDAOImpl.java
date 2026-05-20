@@ -4,7 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import com.entity.itemdtls;
 
@@ -62,129 +65,68 @@ public class ItemDAOImpl implements ItemDAO {
 
     @Override
     public List<itemdtls> getAllItems() {
+        return getItemsFromQuery(
+                "select * from itemdtl order by item_id desc",
+                new SqlParameterSetter() {
+                    @Override
+                    public void apply(PreparedStatement ps) throws Exception {
+                    }
+                });
+    }
 
-        List<itemdtls> list =
-                new ArrayList<itemdtls>();
+    @Override
+    public List<itemdtls> getDistinctCatalogItems() {
 
-        try {
+        List<itemdtls> list = getItemsFromQuery(
+                "select * from itemdtl order by item_id desc",
+                new SqlParameterSetter() {
+                    @Override
+                    public void apply(PreparedStatement ps) throws Exception {
+                    }
+                });
 
-            String sql =
-                    "select * from itemdtl order by item_id desc";
-
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            while(rs.next()) {
-
-                list.add(mapItem(rs));
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return list;
+        return deduplicateByName(list, 0);
     }
 
     @Override
     public List<itemdtls> getLatestItems(int limit) {
+        List<itemdtls> list = getItemsFromQuery(
+                "select * from itemdtl order by item_id desc",
+                new SqlParameterSetter() {
+                    @Override
+                    public void apply(PreparedStatement ps) throws Exception {
+                    }
+                });
 
-        List<itemdtls> list =
-                new ArrayList<itemdtls>();
-
-        try {
-
-            String sql =
-                    "select * from itemdtl order by item_id desc limit ?";
-
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
-
-            ps.setInt(1, limit);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            while(rs.next()) {
-
-                list.add(mapItem(rs));
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return list;
+        return deduplicateByName(list, limit);
     }
 
     @Override
     public List<itemdtls> getRecommendedItems(int limit) {
+        List<itemdtls> list = getItemsFromQuery(
+                "select * from itemdtl where item_status=? and item_quantity > 0 order by item_quantity desc, item_id desc",
+                new SqlParameterSetter() {
+                    @Override
+                    public void apply(PreparedStatement ps) throws Exception {
+                        ps.setString(1, "Available");
+                    }
+                });
 
-        List<itemdtls> list =
-                new ArrayList<itemdtls>();
-
-        try {
-
-            String sql =
-                    "select * from itemdtl where item_status=? and item_quantity > 0 order by item_quantity desc, item_id desc limit ?";
-
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
-
-            ps.setString(1, "Available");
-            ps.setInt(2, limit);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            while(rs.next()) {
-
-                list.add(mapItem(rs));
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return list;
+        return deduplicateByName(list, limit);
     }
 
     @Override
     public List<itemdtls> getItemsByStatus(String status) {
+        List<itemdtls> list = getItemsFromQuery(
+                "select * from itemdtl where item_status=? order by item_id desc",
+                new SqlParameterSetter() {
+                    @Override
+                    public void apply(PreparedStatement ps) throws Exception {
+                        ps.setString(1, status);
+                    }
+                });
 
-        List<itemdtls> list =
-                new ArrayList<itemdtls>();
-
-        try {
-
-            String sql =
-                    "select * from itemdtl where item_status=? order by item_id desc";
-
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
-
-            ps.setString(1, status);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            while(rs.next()) {
-
-                list.add(mapItem(rs));
-            }
-
-        } catch (Exception e) {
-
-            e.printStackTrace();
-        }
-
-        return list;
+        return deduplicateByName(list, 0);
     }
 
     @Override
@@ -198,31 +140,56 @@ public class ItemDAOImpl implements ItemDAO {
             }
             keyword = keyword.trim();
 
-            String sql =
-                    "select * from itemdtl where lower(item_name) like ? or lower(category) like ? or lower(item_status) like ? order by item_id desc";
-
-            PreparedStatement ps =
-                    conn.prepareStatement(sql);
-
             String search = "%" + keyword.toLowerCase() + "%";
-            ps.setString(1, search);
-            ps.setString(2, search);
-            ps.setString(3, search);
-
-            ResultSet rs =
-                    ps.executeQuery();
-
-            while(rs.next()) {
-
-                list.add(mapItem(rs));
-            }
+            list = getItemsFromQuery(
+                    "select * from itemdtl where lower(item_name) like ? or lower(category) like ? or lower(item_status) like ? order by item_id desc",
+                    new SqlParameterSetter() {
+                        @Override
+                        public void apply(PreparedStatement ps) throws Exception {
+                            ps.setString(1, search);
+                            ps.setString(2, search);
+                            ps.setString(3, search);
+                        }
+                    });
 
         } catch (Exception e) {
 
             e.printStackTrace();
         }
 
-        return list;
+        return deduplicateByName(list, 0);
+    }
+
+    @Override
+    public boolean itemNameExists(String itemName) {
+        return itemNameExists(itemName, 0);
+    }
+
+    @Override
+    public boolean itemNameExists(String itemName, int excludeId) {
+        boolean exists = false;
+
+        try {
+            String sql =
+                    "select 1 from itemdtl where lower(trim(item_name))=? and item_id<>? limit 1";
+
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            ps.setString(1, normalizeName(itemName));
+            ps.setInt(2, excludeId);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            exists = rs.next();
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return exists;
     }
 
 	@Override
@@ -320,6 +287,69 @@ public class ItemDAOImpl implements ItemDAO {
         i.setEmail(rs.getString(8));
 
         return i;
+    }
+
+    private List<itemdtls> getItemsFromQuery(String sql,
+            SqlParameterSetter setter) {
+
+        List<itemdtls> list = new ArrayList<itemdtls>();
+
+        try {
+            PreparedStatement ps =
+                    conn.prepareStatement(sql);
+
+            setter.apply(ps);
+
+            ResultSet rs =
+                    ps.executeQuery();
+
+            while(rs.next()) {
+                list.add(mapItem(rs));
+            }
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+        }
+
+        return list;
+    }
+
+    private List<itemdtls> deduplicateByName(List<itemdtls> items, int limit) {
+
+        Map<String, itemdtls> uniqueItems = new LinkedHashMap<String, itemdtls>();
+
+        for(itemdtls item : items) {
+            String key = normalizeName(item.getItem_name());
+
+            if(key.isEmpty()) {
+                key = "item-id-" + item.getItem_id();
+            }
+
+            if(!uniqueItems.containsKey(key)) {
+                uniqueItems.put(key, item);
+            }
+        }
+
+        List<itemdtls> deduplicatedItems = new ArrayList<itemdtls>(uniqueItems.values());
+
+        if(limit > 0 && deduplicatedItems.size() > limit) {
+            return new ArrayList<itemdtls>(deduplicatedItems.subList(0, limit));
+        }
+
+        return deduplicatedItems;
+    }
+
+    private String normalizeName(String itemName) {
+        if(itemName == null) {
+            return "";
+        }
+
+        return itemName.trim().toLowerCase(Locale.ENGLISH);
+    }
+
+    private interface SqlParameterSetter {
+        void apply(PreparedStatement ps) throws Exception;
     }
 
 }

@@ -2,6 +2,7 @@ package com.admin.servlet;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -28,20 +29,20 @@ public class ItemsAdd extends HttpServlet {
         try {
 
             String item_name =
-                    req.getParameter("itemname");
+                    safeTrim(req.getParameter("itemname"));
 
             int item_quantity =
                     Integer.parseInt(
                     req.getParameter("quantity"));
 
             String price =
-                    req.getParameter("price");
+                    safeTrim(req.getParameter("price"));
 
             String category =
-                    req.getParameter("category");
+                    safeTrim(req.getParameter("category"));
 
             String item_status =
-                    req.getParameter("status");
+                    safeTrim(req.getParameter("status"));
 
             Part part =
                     req.getPart("photo");
@@ -51,6 +52,16 @@ public class ItemsAdd extends HttpServlet {
 
             HttpSession session =
                     req.getSession();
+
+            if(item_name.isEmpty()) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Item name is required");
+
+                resp.sendRedirect(
+                        "admin/add_items.jsp");
+                return;
+            }
 
             if(item_quantity < 0) {
                 session.setAttribute(
@@ -72,11 +83,24 @@ public class ItemsAdd extends HttpServlet {
                 return;
             }
 
+            double parsedPrice = parsePrice(price);
+            if(parsedPrice < 0) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Please enter a valid non-negative price");
+
+                resp.sendRedirect(
+                        "admin/add_items.jsp");
+                return;
+            }
+
+            String normalizedPrice = String.format(Locale.US, "%.2f", parsedPrice);
+
             itemdtls i = new itemdtls(
 
                     item_name,
                     item_quantity,
-                    price,
+                    normalizedPrice,
                     category,
                     item_status,
                     fileName,
@@ -86,6 +110,16 @@ public class ItemsAdd extends HttpServlet {
 
             ItemDAOImpl dao =
                     new ItemDAOImpl(DBConnect.getConn());
+
+            if(dao.itemNameExists(item_name)) {
+                session.setAttribute(
+                        "failedMsg",
+                        "An item with this name already exists. Edit the existing item instead of adding a duplicate.");
+
+                resp.sendRedirect(
+                        "admin/add_items.jsp");
+                return;
+            }
             
             boolean f = dao.additems(i);
 
@@ -124,6 +158,18 @@ public class ItemsAdd extends HttpServlet {
                     "Failed To Add Item");
             resp.sendRedirect(
                     "admin/add_items.jsp");
+        }
+    }
+
+    private String safeTrim(String value) {
+        return value == null ? "" : value.trim();
+    }
+
+    private double parsePrice(String value) {
+        try {
+            return Double.parseDouble(value);
+        } catch (Exception e) {
+            return -1.0;
         }
     }
 }
