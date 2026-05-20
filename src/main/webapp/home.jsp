@@ -121,7 +121,7 @@ session.removeAttribute("succMsg");
 				<p class="label-text mb-1">Email</p>
 				<p class="value-text mb-4"><%=homeUser.getEmail()%></p>
 				<p class="label-text mb-1">Phone</p>
-				<p class="value-text mb-0"><%=homeUser.getPhno()%></p>
+				<p class="value-text mb-0"><%=homeUser.getPhno() == null || homeUser.getPhno().trim().isEmpty() ? "Not provided" : homeUser.getPhno()%></p>
 			</div>
 		</div>
 	</div>

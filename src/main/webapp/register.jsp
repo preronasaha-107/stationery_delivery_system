@@ -52,13 +52,13 @@ session.removeAttribute("failedMsg");
 
   </div>
   <div class="form-group">
-    <label for="registerPhone">Phone no.</label>
+    <label for="registerPhone">Phone no. (optional)</label>
     <input type="tel" class="form-control" id="registerPhone" aria-describedby="phoneHelp"
-    required="required" name="phno" placeholder="+91 98765 43210"
+    name="phno" placeholder="+91 98765 43210"
     pattern="(?:\+91\s?)?[6-9][0-9]{4}\s?[0-9]{5}"
     title="Enter a valid Indian phone number such as +91 98765 43210"
     maxlength="15" onblur="formatIndianPhoneNumber(this)">
-    <small id="phoneHelp" class="form-text text-muted">OTP will be sent to your email after these details are submitted.</small>
+    <small id="phoneHelp" class="form-text text-muted">Leave this blank if you do not want to add a phone number right now. OTP will be sent to your email after these details are submitted.</small>
 
   </div>
   <div class="form-group">

@@ -40,7 +40,7 @@ public class RegisterServlet extends HttpServlet {
 
             HttpSession session = req.getSession();
 
-            if(name.isEmpty() || email.isEmpty() || phno.isEmpty() || password.isEmpty()) {
+            if(name.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 session.setAttribute(
                         "failedMsg",
                         "Please fill in all registration details");
@@ -49,14 +49,17 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
 
-            String normalizedPhone = PhoneNumberUtil.normalizeForStorage(phno);
-            if(normalizedPhone == null) {
-                session.setAttribute(
-                        "failedMsg",
-                        "Please enter a valid phone number in the format +91 98765 43210");
+            String normalizedPhone = "";
+            if(!phno.isEmpty()) {
+                normalizedPhone = PhoneNumberUtil.normalizeForStorage(phno);
+                if(normalizedPhone == null) {
+                    session.setAttribute(
+                            "failedMsg",
+                            "Please enter a valid phone number in the format +91 98765 43210");
 
-                resp.sendRedirect("register.jsp");
-                return;
+                    resp.sendRedirect("register.jsp");
+                    return;
+                }
             }
 
             us.setPhno(normalizedPhone);
