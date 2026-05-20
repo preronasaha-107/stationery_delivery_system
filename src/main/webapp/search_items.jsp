@@ -68,8 +68,10 @@ for(itemdtls i : itemList){
 <div class="col-md-3 mb-4">
 <div class="card store-item-card crd-ho h-100">
 <div class="card-body">
+<div class="store-item-media">
 <img alt="<%=i.getItem_name()%>" src="<%=resolveImagePath(application, i.getPhotoname())%>"
-class="store-item-img mb-3">
+class="store-item-img">
+</div>
 <p class="store-item-title"><%=i.getItem_name()%></p>
 <p class="store-item-summary">Category: <%=i.getCategory()%></p>
 <p class="store-item-summary">Status: <%=i.getItem_status()%></p>
