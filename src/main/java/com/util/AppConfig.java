@@ -1,6 +1,12 @@
 package com.util;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Properties;
 
 public final class AppConfig {
@@ -67,9 +73,28 @@ public final class AppConfig {
             if (inputStream != null) {
                 properties.load(inputStream);
                 inputStream.close();
+                return properties;
             }
         } catch (Exception e) {
             e.printStackTrace();
+        }
+
+        List<Path> fallbackPaths = Arrays.asList(
+                Paths.get("src", "main", "java", "app.properties"),
+                Paths.get("build", "classes", "app.properties"),
+                Paths.get("app.properties"));
+
+        for (Path path : fallbackPaths) {
+            try {
+                if (Files.exists(path)) {
+                    InputStream inputStream = new FileInputStream(path.toFile());
+                    properties.load(inputStream);
+                    inputStream.close();
+                    return properties;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
 
         return properties;
