@@ -1,6 +1,10 @@
 package com.user.servlet;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -10,8 +14,12 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
 import com.DAO.CartDAOImpl;
+import com.DAO.OrderDAOImpl;
 import com.DB.DBConnect;
+import com.entity.Cart;
+import com.entity.ItemOrder;
 import com.entity.User;
+import com.util.PhoneNumberUtil;
 
 @WebServlet("/place_order")
 public class PlaceOrderServlet extends HttpServlet {
@@ -49,7 +57,14 @@ public class PlaceOrderServlet extends HttpServlet {
         expiry = safeTrim(expiry);
         cvv = safeTrim(cvv);
 
-        CartDAOImpl dao = new CartDAOImpl(DBConnect.getConn());
+        Connection conn = DBConnect.getConn();
+        if(conn == null) {
+            session.setAttribute("failedMsg", "Database connection is unavailable right now.");
+            resp.sendRedirect("checkout.jsp");
+            return;
+        }
+
+        CartDAOImpl dao = new CartDAOImpl(conn);
         double grandTotal = 0.0;
 
         try {
@@ -65,7 +80,16 @@ public class PlaceOrderServlet extends HttpServlet {
             return;
         }
 
-        if(dao.getCartByUser(loginUser.getId()).isEmpty()) {
+        String normalizedPhone = PhoneNumberUtil.normalizeForStorage(phone);
+        if(normalizedPhone == null) {
+            session.setAttribute("failedMsg", "Please enter a valid phone number in the format +91 98765 43210.");
+            resp.sendRedirect("checkout.jsp");
+            return;
+        }
+
+        List<Cart> cartItems = dao.getCartByUser(loginUser.getId());
+
+        if(cartItems.isEmpty()) {
             session.setAttribute("failedMsg", "Your cart is empty.");
             resp.sendRedirect("cart.jsp?uid=" + loginUser.getId());
             return;
@@ -80,24 +104,76 @@ public class PlaceOrderServlet extends HttpServlet {
             }
         }
 
-        boolean cleared = dao.clearCartByUser(loginUser.getId());
+        String orderId = "ORD" + System.currentTimeMillis();
+        String fullAddress = address + ", " + city;
+        String paymentLabel = "COD".equalsIgnoreCase(paymentMethod) ? "Cash On Delivery" : paymentMethod;
+        List<ItemOrder> orders = new ArrayList<ItemOrder>();
 
-        if(!cleared) {
+        for(Cart cartItem : cartItems) {
+            ItemOrder order = new ItemOrder();
+            order.setOrderId(orderId);
+            order.setUserName(customerName);
+            order.setEmail(loginUser.getEmail());
+            order.setAddress(fullAddress);
+            order.setPhno(normalizedPhone);
+            order.setItemName(buildOrderItemName(cartItem));
+            order.setPrice(String.format(Locale.US, "%.2f", cartItem.getTotal_price()));
+            order.setPayment(paymentLabel);
+            orders.add(order);
+        }
+
+        boolean placedSuccessfully = false;
+
+        try {
+            conn.setAutoCommit(false);
+
+            OrderDAOImpl orderDao = new OrderDAOImpl(conn);
+            boolean saved = orderDao.saveOrders(orders);
+            boolean cleared = dao.clearCartByUser(loginUser.getId());
+
+            if(saved && cleared) {
+                conn.commit();
+                placedSuccessfully = true;
+            } else {
+                conn.rollback();
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            try {
+                conn.rollback();
+            } catch (Exception rollbackException) {
+                rollbackException.printStackTrace();
+            }
+        } finally {
+            try {
+                conn.setAutoCommit(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        if(!placedSuccessfully) {
             session.setAttribute("failedMsg", "We could not place your order right now.");
             resp.sendRedirect("checkout.jsp");
             return;
         }
 
-        String orderId = "ORD" + System.currentTimeMillis();
-
         session.setAttribute("orderId", orderId);
         session.setAttribute("orderCustomerName", customerName);
-        session.setAttribute("orderPhone", phone);
-        session.setAttribute("orderAddress", address + ", " + city);
-        session.setAttribute("orderPaymentMethod", paymentMethod);
+        session.setAttribute("orderPhone", normalizedPhone);
+        session.setAttribute("orderAddress", fullAddress);
+        session.setAttribute("orderPaymentMethod", paymentLabel);
         session.setAttribute("orderTotal", grandTotal);
 
         resp.sendRedirect("order_success.jsp");
+    }
+
+    private String buildOrderItemName(Cart cartItem) {
+        if(cartItem.getQuantity() > 1) {
+            return cartItem.getItemname() + " (Qty: " + cartItem.getQuantity() + ")";
+        }
+        return cartItem.getItemname();
     }
 
     private String safeTrim(String value) {

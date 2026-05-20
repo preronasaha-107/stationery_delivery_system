@@ -89,7 +89,7 @@ session.removeAttribute("succMsg");
 %>
 
 						<h1 class="text-center login-title mb-2">Welcome back</h1>
-						<p class="text-center login-subtitle mb-4">Sign in to continue shopping.</p>
+						<p class="text-center login-subtitle mb-4">Sign in to continue shopping. We will email you a one-time OTP after password verification.</p>
 						<form action="login" method="post">
 							<div class="form-group">
 								<label for="loginEmail" class="login-label">Email address</label>

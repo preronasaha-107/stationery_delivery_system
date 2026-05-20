@@ -12,6 +12,8 @@ import javax.servlet.http.HttpSession;
 import com.DAO.UserDAOImpl;
 import com.DB.DBConnect;
 import com.entity.User;
+import com.util.BrevoEmailService;
+import com.util.OtpUtil;
 
 import java.sql.Connection;
 
@@ -61,14 +63,27 @@ public class LoginServlet extends HttpServlet {
         User us = dao.login(email, password);
 
         if (us != null) {
+            try {
+                String otp = OtpUtil.generateOtp();
+                long expiryTime = OtpUtil.createExpiryTime();
 
-            session.removeAttribute("adminEmail");
-            session.setAttribute("user", "normal");
-            session.setAttribute("userobj", us);
-            session.setAttribute("userEmail", us.getEmail());
-            session.setAttribute("succMsg", "Welcome back, " + us.getName() + "!");
+                BrevoEmailService emailService = new BrevoEmailService();
+                emailService.sendOtpEmail(us.getEmail(), us.getName(), otp, "login");
 
-            response.sendRedirect("home.jsp");
+                OtpUtil.clearPendingAuth(session);
+                session.removeAttribute("userobj");
+                session.removeAttribute("userEmail");
+                session.setAttribute(OtpUtil.SESSION_PENDING_LOGIN_USER, us);
+                OtpUtil.storeOtp(session, "login", us.getEmail(), otp, expiryTime);
+                session.setAttribute("succMsg", "We sent an OTP to your email. Enter it to finish logging in.");
+
+                response.sendRedirect("verify_otp.jsp");
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                session.setAttribute("failedMsg", "We could not send the OTP email. " + e.getMessage());
+                response.sendRedirect("login.jsp");
+            }
 
         } else {
 
