@@ -1,0 +1,7 @@
+# Copy this file to app.properties in the same folder and fill in your real values.
+# Do not commit the real app.properties file.
+
+brevo.api.key=
+brevo.sender.email=
+brevo.sender.name=Stationery Delivery
+otp.expiry.minutes=5

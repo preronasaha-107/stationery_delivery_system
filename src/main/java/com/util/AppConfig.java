@@ -1,6 +1,11 @@
 package com.util;
 
+import java.io.InputStream;
+import java.util.Properties;
+
 public final class AppConfig {
+
+    private static final Properties FILE_PROPERTIES = loadFileProperties();
 
     private AppConfig() {
     }
@@ -11,7 +16,17 @@ public final class AppConfig {
             return value;
         }
 
-        return normalize(System.getenv(environmentKey));
+        value = normalize(System.getenv(environmentKey));
+        if (value != null) {
+            return value;
+        }
+
+        value = normalize(FILE_PROPERTIES.getProperty(propertyKey));
+        if (value != null) {
+            return value;
+        }
+
+        return normalize(FILE_PROPERTIES.getProperty(environmentKey));
     }
 
     public static String require(String propertyKey, String environmentKey, String label) {
@@ -42,5 +57,21 @@ public final class AppConfig {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static Properties loadFileProperties() {
+        Properties properties = new Properties();
+
+        try {
+            InputStream inputStream = AppConfig.class.getClassLoader().getResourceAsStream("app.properties");
+            if (inputStream != null) {
+                properties.load(inputStream);
+                inputStream.close();
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return properties;
     }
 }
