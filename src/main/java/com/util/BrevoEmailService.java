@@ -12,16 +12,35 @@ import java.nio.charset.StandardCharsets;
 public class BrevoEmailService {
 
     private static final String BREVO_API_URL = "https://api.brevo.com/v3/smtp/email";
+    
+    // Local fallback for simple setup.
+    // If app.properties / environment variables are not working on a machine,
+    // paste the values here directly and restart the server.
+    private static final String LOCAL_BREVO_API_KEY = "";
+    private static final String LOCAL_BREVO_SENDER_EMAIL = "";
+    private static final String LOCAL_BREVO_SENDER_NAME = "Stationery Delivery";
 
     public void sendOtpEmail(String recipientEmail, String recipientName, String otpCode, String purpose)
             throws IOException {
 
-        String apiKey = AppConfig.require("brevo.api.key", "BREVO_API_KEY", "Brevo API key");
-        String senderEmail = AppConfig.require("brevo.sender.email", "BREVO_SENDER_EMAIL", "Brevo sender email");
+        String apiKey = firstConfigured(
+                AppConfig.get("brevo.api.key", "BREVO_API_KEY"),
+                LOCAL_BREVO_API_KEY);
+        String senderEmail = firstConfigured(
+                AppConfig.get("brevo.sender.email", "BREVO_SENDER_EMAIL"),
+                LOCAL_BREVO_SENDER_EMAIL);
         String senderName = AppConfig.get("brevo.sender.name", "BREVO_SENDER_NAME");
 
+        if (apiKey == null) {
+            throw new IllegalStateException("Brevo API key is not configured.");
+        }
+
+        if (senderEmail == null) {
+            throw new IllegalStateException("Brevo sender email is not configured.");
+        }
+
         if (senderName == null) {
-            senderName = "Stationery Delivery";
+            senderName = firstConfigured(LOCAL_BREVO_SENDER_NAME, "Stationery Delivery");
         }
 
         String subject = "register".equalsIgnoreCase(purpose)
@@ -125,5 +144,14 @@ public class BrevoEmailService {
                 .replace(">", "&gt;")
                 .replace("\"", "&quot;")
                 .replace("'", "&#39;");
+    }
+    
+    private String firstConfigured(String... values) {
+        for (String value : values) {
+            if (value != null && !value.trim().isEmpty()) {
+                return value.trim();
+            }
+        }
+        return null;
     }
 }

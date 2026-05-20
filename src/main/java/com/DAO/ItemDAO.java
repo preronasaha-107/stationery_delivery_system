@@ -10,10 +10,13 @@ public interface ItemDAO {
     public boolean additems(itemdtls i);
 
     public List<itemdtls> getAllItems();
+    public List<itemdtls> getDistinctCatalogItems();
     public List<itemdtls> getLatestItems(int limit);
     public List<itemdtls> getRecommendedItems(int limit);
     public List<itemdtls> getItemsByStatus(String status);
     public List<itemdtls> searchItems(String keyword);
+    public boolean itemNameExists(String itemName);
+    public boolean itemNameExists(String itemName, int excludeId);
     
     public itemdtls getItemById(int id);
   

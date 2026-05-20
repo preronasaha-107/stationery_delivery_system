@@ -125,7 +125,7 @@ Items Available In Stock :
 <p>
 Single Item Price :
 <span class="text-danger font-weight-bold">
-&#8377; <%=b.getPrice()%>
+&#8377; <%=formatPrice(b.getPrice())%>
 </span>
 </p>
 
@@ -170,12 +170,12 @@ class="btn btn-danger mr-2"
 <%=b.getItem_quantity() <= 0 ? "disabled" : ""%>>
 
 <i class="fas fa-cart-plus"></i>
-Add Cart
+Add to Cart
 </button>
 <% } %>
 
 <span class="btn btn-success">
-&#8377; <%=b.getPrice()%>
+&#8377; <%=formatPrice(b.getPrice())%>
 </span>
 </form>
 

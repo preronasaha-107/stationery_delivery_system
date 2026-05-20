@@ -22,7 +22,6 @@ List<ItemOrder> orders = orderDao.getAllOrders();
 <table class="table table-striped">
   <thead class="bg-primary text-white">
     <tr>
-      <th scope="col">DB Id</th>
       <th scope="col"> Order Id</th>
       <th scope="col"> Name</th>
       <th scope="col">Email</th>
@@ -37,13 +36,12 @@ List<ItemOrder> orders = orderDao.getAllOrders();
   <tbody>
     <% if(orders.isEmpty()){ %>
     <tr>
-      <td colspan="9" class="text-center">No orders found in the database.</td>
+      <td colspan="8" class="text-center">No orders found in the database.</td>
     </tr>
     <% } else { %>
     <% for(ItemOrder order : orders){ %>
     <tr>
-      <th scope="row"><%=order.getId()%></th>
-      <td><%=order.getOrderId()%></td>
+      <th scope="row"><%=order.getOrderId()%></th>
       <td><%=order.getUserName()%></td>
       <td><%=order.getEmail()%></td>
       <td><%=order.getAddress()%></td>

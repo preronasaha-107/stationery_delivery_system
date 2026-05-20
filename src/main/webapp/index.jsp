@@ -26,15 +26,6 @@ background-color:#f7f7f7;
 background-color:#ffffff;
 border:1px solid #dee2e6;
 }
-.item-card{
-border:1px solid #dee2e6;
-}
-.item-img{
-width:100%;
-height:220px;
-object-fit:cover;
-background:#f8f9fa;
-}
 </style>
 </head>
 <body>
@@ -79,15 +70,19 @@ if(recommendedItems.isEmpty()){
 for(itemdtls item : recommendedItems){
 %>
 <div class="col-lg-4 col-md-6 mb-4">
-<div class="card item-card h-100">
+<div class="card store-item-card h-100">
 <div class="card-body">
-<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="item-img mb-3">
-<p class="mb-1"><strong><%=item.getItem_name()%></strong></p>
-<p class="text-muted mb-1">Category: <%=item.getCategory()%></p>
-<p class="text-muted mb-3">Stock: <%=item.getItem_quantity()%> item(s)</p>
-<div class="d-flex justify-content-between align-items-center">
-<strong class="text-danger">&#8377; <%=item.getPrice()%></strong>
+<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="store-item-img mb-3">
+<p class="store-item-title"><%=item.getItem_name()%></p>
+<p class="store-item-summary">Category: <%=item.getCategory()%></p>
+<p class="store-item-summary">Stock: <%=item.getItem_quantity()%> item(s)</p>
+<div class="store-item-footer">
+<div class="store-item-actions">
+<span class="store-item-price">&#8377; <%=formatPrice(item.getPrice())%></span>
+<div class="store-item-button-group">
 <a href="view_items.jsp?id=<%=item.getItem_id()%>" class="btn btn-sm btn-success">View Details</a>
+</div>
+</div>
 </div>
 </div>
 </div>
@@ -125,21 +120,23 @@ for(itemdtls item : latestItems){
     boolean available = isItemAvailable(item);
 %>
 <div class="col-lg-4 col-md-6 mb-4">
-<div class="card item-card h-100">
+<div class="card store-item-card h-100">
 <div class="card-body">
-<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="item-img mb-3">
-<p class="mb-1"><strong><%=item.getItem_name()%></strong></p>
-<p class="text-muted mb-1">Category: <%=item.getCategory()%></p>
-<p class="text-muted mb-3">Status: <%=item.getItem_status()%></p>
-<div class="d-flex justify-content-between align-items-center">
-<strong class="text-danger">&#8377; <%=item.getPrice()%></strong>
-<div>
+<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="store-item-img mb-3">
+<p class="store-item-title"><%=item.getItem_name()%></p>
+<p class="store-item-summary">Category: <%=item.getCategory()%></p>
+<p class="store-item-summary">Status: <%=item.getItem_status()%></p>
+<div class="store-item-footer">
+<div class="store-item-actions">
+<span class="store-item-price">&#8377; <%=formatPrice(item.getPrice())%></span>
+<div class="store-item-button-group">
 <% if(available){ %>
-<a href="view_items.jsp?id=<%=item.getItem_id()%>" class="btn btn-sm btn-danger mr-1">Add Cart</a>
+<a href="view_items.jsp?id=<%=item.getItem_id()%>" class="btn btn-sm btn-danger">Add to Cart</a>
 <% } else { %>
-<span class="btn btn-sm btn-secondary mr-1 disabled">Unavailable</span>
+<span class="btn btn-sm btn-secondary disabled">Unavailable</span>
 <% } %>
-<a href="view_items.jsp?id=<%=item.getItem_id()%>" class="btn btn-sm btn-success">View</a>
+<a href="view_items.jsp?id=<%=item.getItem_id()%>" class="btn btn-sm btn-success">View Details</a>
+</div>
 </div>
 </div>
 </div>

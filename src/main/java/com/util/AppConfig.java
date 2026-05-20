@@ -1,6 +1,17 @@
 package com.util;
 
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Properties;
+
 public final class AppConfig {
+
+    private static final Properties FILE_PROPERTIES = loadFileProperties();
 
     private AppConfig() {
     }
@@ -11,7 +22,17 @@ public final class AppConfig {
             return value;
         }
 
-        return normalize(System.getenv(environmentKey));
+        value = normalize(System.getenv(environmentKey));
+        if (value != null) {
+            return value;
+        }
+
+        value = normalize(FILE_PROPERTIES.getProperty(propertyKey));
+        if (value != null) {
+            return value;
+        }
+
+        return normalize(FILE_PROPERTIES.getProperty(environmentKey));
     }
 
     public static String require(String propertyKey, String environmentKey, String label) {
@@ -42,5 +63,40 @@ public final class AppConfig {
 
         String trimmed = value.trim();
         return trimmed.isEmpty() ? null : trimmed;
+    }
+
+    private static Properties loadFileProperties() {
+        Properties properties = new Properties();
+
+        try {
+            InputStream inputStream = AppConfig.class.getClassLoader().getResourceAsStream("app.properties");
+            if (inputStream != null) {
+                properties.load(inputStream);
+                inputStream.close();
+                return properties;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<Path> fallbackPaths = Arrays.asList(
+                Paths.get("src", "main", "java", "app.properties"),
+                Paths.get("build", "classes", "app.properties"),
+                Paths.get("app.properties"));
+
+        for (Path path : fallbackPaths) {
+            try {
+                if (Files.exists(path)) {
+                    InputStream inputStream = new FileInputStream(path.toFile());
+                    properties.load(inputStream);
+                    inputStream.close();
+                    return properties;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        return properties;
     }
 }

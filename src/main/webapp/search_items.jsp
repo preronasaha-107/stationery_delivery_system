@@ -19,7 +19,7 @@ String displayQuery = query
 		.replace(">", "&gt;");
 
 ItemDAOImpl dao = new ItemDAOImpl(DBConnect.getConn());
-List<itemdtls> itemList = query.isEmpty() ? dao.getAllItems() : dao.searchItems(query);
+List<itemdtls> itemList = query.isEmpty() ? dao.getDistinctCatalogItems() : dao.searchItems(query);
 %>
 
 <!DOCTYPE html>
@@ -66,30 +66,33 @@ for(itemdtls i : itemList){
 			&& "Available".equalsIgnoreCase(i.getItem_status());
 %>
 <div class="col-md-3 mb-4">
-<div class="card crd-ho h-100">
-<div class="card-body text-center">
+<div class="card store-item-card crd-ho h-100">
+<div class="card-body">
 <img alt="<%=i.getItem_name()%>" src="<%=resolveImagePath(application, i.getPhotoname())%>"
-style="width:180px;height:180px" class="img-thumblin">
-<p class="mt-2 mb-1"><%=i.getItem_name()%></p>
-<p class="mb-1">Category: <%=i.getCategory()%></p>
-<p class="mb-1">Status: <%=i.getItem_status()%></p>
-<p class="mb-3">In Stock: <%=i.getItem_quantity()%></p>
-
+class="store-item-img mb-3">
+<p class="store-item-title"><%=i.getItem_name()%></p>
+<p class="store-item-summary">Category: <%=i.getCategory()%></p>
+<p class="store-item-summary">Status: <%=i.getItem_status()%></p>
+<p class="store-item-summary">In Stock: <%=i.getItem_quantity()%></p>
+<div class="store-item-footer">
+<div class="store-item-actions">
+<span class="store-item-price">&#8377; <%=formatPrice(i.getPrice())%></span>
+<div class="store-item-button-group">
 <% if(inStock){ %>
 <a href="view_items.jsp?id=<%=i.getItem_id()%>"
-class="btn btn-danger btn-sm ml-1">
-Add Cart
+class="btn btn-danger btn-sm">
+Add to Cart
 </a>
 <% } else { %>
-<span class="btn btn-secondary btn-sm ml-1 disabled">Unavailable</span>
+<span class="btn btn-secondary btn-sm disabled">Unavailable</span>
 <% } %>
 <a href="view_items.jsp?id=<%=i.getItem_id()%>"
-class="btn btn-success btn-sm ml-1">
+class="btn btn-success btn-sm">
 View Details
 </a>
-<span class="btn btn-danger btn-sm ml-1">
-&#8377; <%=i.getPrice()%>
-</span>
+</div>
+</div>
+</div>
 </div>
 </div>
 </div>
