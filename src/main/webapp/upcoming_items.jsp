@@ -39,7 +39,9 @@ body{background-color:#f7f7f7;}
 <div class="col-lg-3 col-md-6 mb-4">
 <div class="card store-item-card h-100">
 <div class="card-body">
-<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="store-item-img mb-3">
+<div class="store-item-media">
+<img alt="<%=item.getItem_name()%>" src="<%=resolveImagePath(application, item.getPhotoname())%>" class="store-item-img">
+</div>
 <p class="store-item-title"><%=item.getItem_name()%></p>
 <p class="store-item-summary">Category: <%=item.getCategory()%></p>
 <p class="store-item-summary">Status: <%=item.getItem_status()%></p>
