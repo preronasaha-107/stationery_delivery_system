@@ -3,6 +3,7 @@
 <%@page import="com.DB.DBConnect"%>
 <%@page import="com.entity.Cart"%>
 <%@page import="com.entity.User"%>
+<%@page import="com.util.PhoneNumberUtil"%>
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
 
@@ -74,7 +75,12 @@ session.removeAttribute("failedMsg");
 </div>
 <div class="form-group col-md-6">
 <label>Phone Number</label>
-<input type="text" class="form-control" name="phone" value="<%=checkoutUser.getPhno()%>" required>
+<input type="tel" class="form-control" name="phone"
+value="<%=PhoneNumberUtil.normalizeForDisplay(checkoutUser.getPhno())%>"
+placeholder="+91 98765 43210"
+pattern="(?:\+91\s?)?[6-9][0-9]{4}\s?[0-9]{5}"
+title="Enter a valid Indian phone number such as +91 98765 43210"
+maxlength="15" onblur="formatIndianPhoneNumber(this)" required>
 </div>
 </div>
 <div class="form-group">
@@ -145,6 +151,21 @@ session.removeAttribute("failedMsg");
 </div>
 
 <script>
+function formatIndianPhoneNumber(input){
+    if(!input){
+        return;
+    }
+
+    var digits = input.value.replace(/\D/g, "");
+    if(digits.length === 12 && digits.indexOf("91") === 0){
+        digits = digits.substring(2);
+    }
+
+    if(digits.length === 10){
+        input.value = "+91 " + digits.substring(0, 5) + " " + digits.substring(5);
+    }
+}
+
 function toggleCardFields(){
     var paymentMethod = document.getElementById("paymentMethod");
     var cardFields = document.getElementById("cardFields");
@@ -154,6 +175,8 @@ function toggleCardFields(){
         cardFields.style.display = "none";
     }
 }
+var phoneInput = document.querySelector('input[name="phone"]');
+formatIndianPhoneNumber(phoneInput);
 toggleCardFields();
 </script>
 

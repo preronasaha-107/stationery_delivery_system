@@ -45,25 +45,30 @@ session.removeAttribute("failedMsg");
                 <h4 class="text-center">Registration Page</h4>
 <form action="register" method="post">
   <div class="form-group">
-    <label for="exampleInputEmail1">Enter Full Name:</label>
-    <input type="text" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp"
+    <label for="registerName">Enter Full Name:</label>
+    <input type="text" class="form-control" id="registerName" aria-describedby="emailHelp"
     required="required" name="fname">
 
 
   </div>
   <div class="form-group">
-    <label for="exampleInputEmail1">Phone no.</label>
-    <input type="number" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required="required" name="phno">
+    <label for="registerPhone">Phone no.</label>
+    <input type="tel" class="form-control" id="registerPhone" aria-describedby="phoneHelp"
+    required="required" name="phno" placeholder="+91 98765 43210"
+    pattern="(?:\+91\s?)?[6-9][0-9]{4}\s?[0-9]{5}"
+    title="Enter a valid Indian phone number such as +91 98765 43210"
+    maxlength="15" onblur="formatIndianPhoneNumber(this)">
+    <small id="phoneHelp" class="form-text text-muted">OTP will be sent to your email after these details are submitted.</small>
 
   </div>
   <div class="form-group">
-    <label for="exampleInputEmail1">Email Address</label>
-    <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" required="required" name="email" >
+    <label for="registerEmail">Email Address</label>
+    <input type="email" class="form-control" id="registerEmail" aria-describedby="emailHelp" required="required" name="email" >
 
   </div>
   <div class="form-group">
-    <label for="exampleInputPassword1">Password</label>
-    <input type="password" class="form-control" id="exampleInputPassword1" required="required" name="password" >
+    <label for="registerPassword">Password</label>
+    <input type="password" class="form-control" id="registerPassword" required="required" name="password" >
   </div>
   <div class="form-check">
     <input type="checkbox" class="form-check-input" id="exampleCheck1" required="required" name="check">
@@ -76,6 +81,22 @@ session.removeAttribute("failedMsg");
         </div>
     </div>
 </div>
+<script>
+function formatIndianPhoneNumber(input){
+    if(!input){
+        return;
+    }
+
+    var digits = input.value.replace(/\D/g, "");
+    if(digits.length === 12 && digits.indexOf("91") === 0){
+        digits = digits.substring(2);
+    }
+
+    if(digits.length === 10){
+        input.value = "+91 " + digits.substring(0, 5) + " " + digits.substring(5);
+    }
+}
+</script>
 <%@include file="all_component/footer.jsp" %>
 </body>
 </html>

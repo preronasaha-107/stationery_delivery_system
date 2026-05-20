@@ -1,5 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="java.util.List" %>
+<%@ page import="com.DAO.OrderDAOImpl" %>
+<%@ page import="com.DB.DBConnect" %>
+<%@ page import="com.entity.ItemOrder" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -10,67 +14,46 @@
 </head>
 <body>
 <%@include file="navbar.jsp"%>
+<%
+OrderDAOImpl orderDao = new OrderDAOImpl(DBConnect.getConn());
+List<ItemOrder> orders = orderDao.getAllOrders();
+%>
 <h2 class="text-center">Admin:Total Orders</h2>
 <table class="table table-striped">
   <thead class="bg-primary text-white">
     <tr>
+      <th scope="col">DB Id</th>
       <th scope="col"> Order Id</th>
       <th scope="col"> Name</th>
       <th scope="col">Email</th>
       <th scope="col">Address</th>
       <th scope="col">Phone no</th>
       <th scope="col">Item Name</th>
-      <th scope="col">Item Quantity</th>
       <th scope="col">Price</th>
-      <th scope="col">Category</th>
       <th scope="col">Payment Type</th>
       
     </tr>
   </thead >
   <tbody>
+    <% if(orders.isEmpty()){ %>
     <tr>
-      <th scope="row">1</th>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>Mark</td>
-      
-      
-     
+      <td colspan="9" class="text-center">No orders found in the database.</td>
     </tr>
+    <% } else { %>
+    <% for(ItemOrder order : orders){ %>
     <tr>
-      <th scope="row">2</th>
-      <td>Jacob</td>
-      <td>Thornton</td>
-      <td>@fat</td>
-      <td>Mark</td>
-      <td>Otto</td>
-      
-      <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>Mark</td>
-      
+      <th scope="row"><%=order.getId()%></th>
+      <td><%=order.getOrderId()%></td>
+      <td><%=order.getUserName()%></td>
+      <td><%=order.getEmail()%></td>
+      <td><%=order.getAddress()%></td>
+      <td><%=order.getPhno()%></td>
+      <td><%=order.getItemName()%></td>
+      <td>&#8377; <%=order.getPrice()%></td>
+      <td><%=order.getPayment()%></td>
     </tr>
-    <tr>
-      <th scope="row">3</th>
-      <td>Larry</td>
-      <td>the Bird</td>
-      <td>@twitter</td>
-      <td>Mark</td>
-      <td>Otto</td>
-      
-     <td>Mark</td>
-      <td>Otto</td>
-      <td>@mdo</td>
-      <td>Mark</td>
-      
-    </tr>
+    <% } %>
+    <% } %>
   </tbody>
 </table>
 <div style="margin-top:195px;">

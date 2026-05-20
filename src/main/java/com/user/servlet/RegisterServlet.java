@@ -11,6 +11,9 @@ import javax.servlet.http.HttpSession;
 import com.DAO.UserDAOImpl;
 import com.DB.DBConnect;
 import com.entity.User;
+import com.util.BrevoEmailService;
+import com.util.OtpUtil;
+import com.util.PhoneNumberUtil;
 
 @WebServlet("/register")
 public class RegisterServlet extends HttpServlet {
@@ -46,6 +49,18 @@ public class RegisterServlet extends HttpServlet {
                 return;
             }
 
+            String normalizedPhone = PhoneNumberUtil.normalizeForStorage(phno);
+            if(normalizedPhone == null) {
+                session.setAttribute(
+                        "failedMsg",
+                        "Please enter a valid phone number in the format +91 98765 43210");
+
+                resp.sendRedirect("register.jsp");
+                return;
+            }
+
+            us.setPhno(normalizedPhone);
+
             if(check != null) {
 
                 UserDAOImpl dao =
@@ -60,21 +75,28 @@ public class RegisterServlet extends HttpServlet {
                     return;
                 }
 
-                boolean f = dao.userRegister(us);
+                try {
+                    String otp = OtpUtil.generateOtp();
+                    long expiryTime = OtpUtil.createExpiryTime();
 
-                if(f) {
+                    BrevoEmailService emailService = new BrevoEmailService();
+                    emailService.sendOtpEmail(us.getEmail(), us.getName(), otp, "register");
 
+                    OtpUtil.clearPendingAuth(session);
+                    session.setAttribute(OtpUtil.SESSION_PENDING_REGISTER_USER, us);
+                    OtpUtil.storeOtp(session, "register", us.getEmail(), otp, expiryTime);
                     session.setAttribute(
                             "succMsg",
-                            "Registration Successfully");
+                            "We sent an OTP to your email. Enter it to complete registration.");
 
-                    resp.sendRedirect("register.jsp");
+                    resp.sendRedirect("verify_otp.jsp");
 
-                } else {
+                } catch (Exception e) {
 
+                    e.printStackTrace();
                     session.setAttribute(
                             "failedMsg",
-                            "Something went wrong");
+                            "We could not send the OTP email. " + e.getMessage());
 
                     resp.sendRedirect("register.jsp");
                 }
